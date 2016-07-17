@@ -7,22 +7,38 @@ classdef TimedResp < StateMachine
             self = self@StateMachine;
             self.p.FunctionName = 'TimedResp';
             % inblock contains own state machine
-            self.p.addParamValue('state', 'idle', @(x) any(not(cellfun('isempty', strfind(x, {'setup', 'inblock', 'postblock'})))));
-            self.p.state = 'setup';
-            self.p.trial_machine = TimedResp_trial;
+            self.ref_time = GetSecs;
+
+            consts = struct('win_size', [30 30 400 400], ...
+                            'reversed', false)
+            self.consts = consts;
 
         end
 
-        function Setup(tgt, varargin)
-
+        function Setup(s, tgt, varargin)
+            Screen('Preference', 'Verbosity', 1);
+            if s.consts.reversed
+                colour = [255 255 255];
+            else
+                colour = [0 0 0];
+            end
+            s.win = PsychWindow(0, true, 'rect', s.consts.win_size,...
+                                'color', colour, ...
+                                'alpha_blending', true);
+            
         end
 
-        function Transition(self, varargin)
-            self.p.parse(varargin{:});
-            opts = self.p.Results;
+        function Execute(s)
+            done = false;
+            stop_conditions = (GetSecs - s.ref_time > 4200) || done;
+            while 1
+                if stop_conditions
+                    break;
+                end
 
-            if opts.state == 'postblock'
-                % clean up
+
+
+
             end
         end
 

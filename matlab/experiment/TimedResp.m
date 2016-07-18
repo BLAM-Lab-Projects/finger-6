@@ -27,8 +27,8 @@ classdef TimedResp < StateMachine
                                 'alpha_blending', true);
 
             % add audio
-            snd1 = wavread('misc/beep.wav');
-            snd2 = wavread('misc/smw_coin.wav');
+            snd1 = wavread('misc/sounds/beep.wav');
+            snd2 = wavread('misc/sounds/smw_coin.wav');
 
             s.aud = PsychAudio('mode', 9);
             s.aud.AddSlave(1, 'channels', 2);
@@ -38,14 +38,26 @@ classdef TimedResp < StateMachine
             s.aud.FillBuffer([snd2; snd2]', 2);
 
             % add images
+            if tgt.image_type(1)
+                subdir = 'shapes/';
+            else
+                subdir = 'hands/';
+            end
+            img_dir = ['misc/images/', subdir];
+            img_names = dir([img_dir, '/*.jpg']);
+
             s.imgs = PsychTextures;
             img_rect = .2 * s.win.Get('rect');
             img_rect = CenterRectOnPoint(img_rect, s.win.center(1), s.win.center(2));
             for ii = 1:length(name_array)
+                img = imread([img_dir, img_names(ii).name]);
                 s.imgs.AddImage(img, s.win.pointer, ii,...
                                 'draw_rect', img_rect);
+            end
 
-        end
+            % add feedback
+
+        end % end setup
 
         function Execute(s)
             done = false;

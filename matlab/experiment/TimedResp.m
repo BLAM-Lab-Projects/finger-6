@@ -18,12 +18,14 @@ classdef TimedResp < StateMachine
         function Setup(s, tgt, varargin)
             Screen('Preference', 'Verbosity', 1);
             if s.consts.reversed
-                colour = [255 255 255];
+                front_color = [0 0 0];
+                back_color = [255 255 255];
             else
-                colour = [0 0 0];
+                front_ccolor = [255 255 255];
+                back_color = [0 0 0];
             end
             s.win = PsychWindow(0, true, 'rect', s.consts.win_size,...
-                                'color', colour, ...
+                                'color', back_color, ...
                                 'alpha_blending', true);
 
             % add audio
@@ -47,7 +49,7 @@ classdef TimedResp < StateMachine
             img_names = dir([img_dir, '/*.jpg']);
 
             s.imgs = PsychTextures;
-            img_rect = .2 * s.win.Get('rect');
+            img_rect = 0.2 * s.win.Get('rect');
             img_rect = CenterRectOnPoint(img_rect, s.win.center(1), s.win.center(2));
             for ii = 1:length(name_array)
                 img = imread([img_dir, img_names(ii).name]);
@@ -56,7 +58,11 @@ classdef TimedResp < StateMachine
             end
 
             % add feedback
-
+            s.feed = PressFeedback(unique(tgt.finger_index), ...
+                                   'fill_color', back_color,...
+                                   'frame_color', front_color, ...
+                                   'rect', , ...
+                                   'pen_width', 2);
         end % end setup
 
         function Execute(s)

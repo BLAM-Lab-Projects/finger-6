@@ -1,7 +1,4 @@
 classdef TimedResp < StateMachine
-    properties
-        trial_machine;
-    end
     methods
         function self = TimedResp
             self = self@StateMachine;
@@ -49,12 +46,12 @@ classdef TimedResp < StateMachine
             img_names = dir([img_dir, '/*.jpg']);
 
             s.imgs = PsychTextures;
-            img_rect = 0.2 * s.win.Get('rect');
-            img_rect = CenterRectOnPoint(img_rect, s.win.center(1), s.win.center(2));
             for ii = 1:length(name_array)
                 img = imread([img_dir, img_names(ii).name]);
                 s.imgs.AddImage(img, s.win.pointer, ii,...
-                                'draw_rect', img_rect);
+                                'rel_x_pos', 0.5, ...
+                                'rel_y_pos', 0.5, ...
+                                'rel_x_scale', 0.23);
             end
 
             % add feedback
@@ -67,9 +64,13 @@ classdef TimedResp < StateMachine
 
         function Execute(s)
             done = false;
-            stop_conditions = (GetSecs - s.ref_time > 4200) || done;
-            while ~stop_conditions
+            time_flip = GetSecs;
+            while ~(GetSecs - s.ref_time > 4200) || done
 
+                time_flip = s.win.Flip(time_flip + (0.7 * s.win.flip_interval));
+                if trial_count > max(s.tgt.trial)
+                    done = true;
+                end
             end
 
         end

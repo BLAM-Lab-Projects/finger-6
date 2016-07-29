@@ -15,7 +15,7 @@ typecast(uint8(a), 'int16')
 // first line does which analog channels to read,
 // second line sets the sampling interval (in microseconds)
 const unsigned int channel_array[2] = {A0, A7};
-const unsigned long period_0 = 10000;
+const unsigned long period_0 = 100000;
 const unsigned int array_size = sizeof(channel_array) / sizeof(int);
 
 unsigned int value_array[array_size];

@@ -1,14 +1,20 @@
-function main(exp_type, tgt)
+function main(exp_type, tgt_name)
     addpath(genpath('Psychoobox'));
     addpath(genpath('matlab'));
+    addpath(genpath('ptbutils'));
 
-    exp = StateMachine.Factory(exp_type);
-    tgt = ParseTgt(tgt, ',');
-    exp.Set('tgt', tgt);
-    exp.Setup();
+    try
+        exp = StateMachine.Factory(exp_type);
+        tgt = ParseTgt(tgt_name, ',');
+        exp.Set('tgt', tgt);
+        exp.Setup();
 
-    exp.Execute();
+        exp.Execute();
 
-    exp.Cleanup();
-
+        exp.Cleanup();
+    catch ME
+        % save data!
+        BailPtb;
+        rethrow(ME);
+    end
 end

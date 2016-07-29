@@ -110,5 +110,10 @@ classdef TimedResp < StateMachine
 
         end
 
+        function Cleanup(self)
+            BailPtb;
+            %...
+        end
+
     end % end methods
 end % end classdef

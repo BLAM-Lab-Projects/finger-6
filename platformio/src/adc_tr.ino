@@ -13,13 +13,14 @@ So the expected size per line is 4 + (2 * n), n being the number of channels.
 // second line sets the sampling interval (in microseconds)
 const unsigned int channel_array[2] = {A0, A7};
 const unsigned long period_0 = 10000;
-
 const unsigned int array_size = sizeof(channel_array) / sizeof(int);
-unsigned int value_array[array_size];
-unsigned int ii;
 
+unsigned int value_array[array_size];
+unsigned int ii = 0;
+volatile bool go_flag = false;
+bool go_flag_copy = false;
 elapsedMicros current_time;
-unsigned long current_time_copy;
+unsigned long current_time_copy = 0;
 IntervalTimer timer_0;
 
 byte time_buf[4];
@@ -44,9 +45,6 @@ void setup() {
   timer_0.begin(timerCallback, period_0);
   delay(500);
 }
-
-volatile bool go_flag = false;
-bool go_flag_copy = false;
 
 FASTRUN void timerCallback(void) {
   go_flag = true;

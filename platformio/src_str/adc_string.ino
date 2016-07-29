@@ -65,11 +65,10 @@ void loop() {
   }
 
   Serial.print(current_time_copy);
-  Serial.print(" ");
 
   for (ii = 0; ii < array_size; ii++) {
-    Serial.print(value_array[ii]);
     Serial.print(" ");
+    Serial.print(value_array[ii]);
   }
   Serial.print("\n");
 }

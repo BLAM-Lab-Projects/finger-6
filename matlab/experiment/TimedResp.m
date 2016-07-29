@@ -68,6 +68,7 @@ classdef TimedResp < StateMachine
             time_flip = GetSecs;
             state = 'intrial';
             neststate = 'prep';
+            trial_count = 1;
             while ~(GetSecs - s.ref_time > 4200) || done
                 loop_time = GetSecs;
 
@@ -75,10 +76,17 @@ classdef TimedResp < StateMachine
                     case 'intrial'
                         switch neststate
                             case 'prep'
+                                audio_played = false;
+                                trial_time = GetSecs;
+                                audio_time = trial_time + 0.5;
+                                img_time = trial_time + tgt.image_time()
+
+                                neststate = 'doneprep';
 
                             case 'doneprep'
-                                if loop_time >= audio_time && audio_not_played
+                                if loop_time >= audio_time && audio_played
 
+                                    audio_played = true;
                                 end
 
                                 if loop_time >= img_time
@@ -96,6 +104,7 @@ classdef TimedResp < StateMachine
                         % draw correctness feedback
 
                     case 'between'
+                        trial_count = trial_count + 1;
 
                     otherwise
                         error('Invalid state.')

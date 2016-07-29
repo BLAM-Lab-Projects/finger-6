@@ -1,4 +1,16 @@
 classdef TimedResp < StateMachine
+
+    properties
+    % in order of appearance...
+        ref_time % reference time for the entire block
+        consts % consts for the experiment
+        win % window/screen for Psychtoolbox
+        aud % audio
+        imgs % images
+        keys % keyboard
+        feed % keyboard feedback
+    end
+
     methods
         function self = TimedResp
             self = self@StateMachine;
@@ -12,13 +24,13 @@ classdef TimedResp < StateMachine
 
         end
 
-        function Setup(s, tgt, varargin)
+        function Setup(s)
             Screen('Preference', 'Verbosity', 1);
             if s.consts.reversed
                 front_color = [0 0 0];
                 back_color = [255 255 255];
             else
-                front_ccolor = [255 255 255];
+                front_color = [255 255 255];
                 back_color = [0 0 0];
             end
             s.win = PsychWindow(0, true, 'rect', s.consts.win_size,...
@@ -37,7 +49,7 @@ classdef TimedResp < StateMachine
             s.aud.FillBuffer([snd2; snd2]', 2);
 
             % add images
-            if tgt.image_type(1)
+            if s.tgt.image_type(1)
                 subdir = 'shapes/';
             else
                 subdir = 'hands/';
@@ -54,12 +66,12 @@ classdef TimedResp < StateMachine
                                 'rel_x_scale', 0.23);
             end
 
-            s.keys = BlamKeyboard(unique(tgt.finger_index));
+            s.keys = BlamKeyboard(unique(s.tgt.finger_index));
             l_keys = length(s.keys.valid_indices);
 
             % add feedback
-            s.feed = BlamKeyFeedback(l_keys, 'fill_color', [0 0 0], ...
-                                     'frame_color', [255 255 255], ...
+            s.feed = BlamKeyFeedback(l_keys, 'fill_color', back_color, ...
+                                     'frame_color', front_color, ...
                                      'rel_x_scale', repmat(0.06, 1, l_keys));
         end % end setup
 
@@ -80,7 +92,7 @@ classdef TimedResp < StateMachine
                                 audio_played = false;
                                 trial_time = GetSecs;
                                 audio_time = trial_time + 0.5;
-                                img_time = trial_time + tgt.image_time()
+                                img_time = trial_time + s.tgt.image_time()
 
                                 neststate = 'doneprep';
 

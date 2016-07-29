@@ -65,7 +65,42 @@ classdef TimedResp < StateMachine
         function Execute(s)
             done = false;
             time_flip = GetSecs;
+            state = 'intrial';
+            neststate = 'prep';
             while ~(GetSecs - s.ref_time > 4200) || done
+                loop_time = GetSecs;
+
+                switch state
+                    case 'intrial'
+                        switch neststate
+                            case 'prep'
+
+                            case 'doneprep'
+                                if loop_time >= audio_time && audio_not_played
+
+                                end
+
+                                if loop_time >= img_time
+
+                                end
+                        end
+
+                        % draw press feedback
+                        if loop_time >= endtrial_time
+                            state = 'feedback';
+                        end
+
+                    case 'feedback'
+
+                        % draw correctness feedback
+
+                    case 'between'
+
+                    otherwise
+                        error('Invalid state.')
+
+                end
+
 
                 time_flip = s.win.Flip(time_flip + (0.7 * s.win.flip_interval));
                 if trial_count > max(s.tgt.trial)

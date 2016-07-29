@@ -3,6 +3,9 @@ Prototypical arduino/teensy code.
 When reading, the first 4 bytes are the timestamp (unsigned long).
 Subsequent pairs of bytes are each input channel (uint8).
 So the expected size per line is 4 + (2 * n), n being the number of channels.
+To convert in MATLAB,
+typecast(uint8(a), 'int32') for long and
+typecast(uint8(a), 'int16')
 */
 
 #include "ADC.h"

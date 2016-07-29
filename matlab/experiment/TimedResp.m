@@ -76,6 +76,7 @@ classdef TimedResp < StateMachine
                     case 'intrial'
                         switch neststate
                             case 'prep'
+                            % all pre-trial things
                                 audio_played = false;
                                 trial_time = GetSecs;
                                 audio_time = trial_time + 0.5;
@@ -84,6 +85,7 @@ classdef TimedResp < StateMachine
                                 neststate = 'doneprep';
 
                             case 'doneprep'
+                            % actual 'trial' (sounds blaring, images flashing...)
                                 if loop_time >= audio_time && audio_played
 
                                     audio_played = true;
@@ -110,15 +112,15 @@ classdef TimedResp < StateMachine
                         error('Invalid state.')
 
                 end
-
-
+                s.win.DrawingFinished();
+                % collect button presses, write data... anything not timing critical
                 time_flip = s.win.Flip(time_flip + (0.7 * s.win.flip_interval));
                 if trial_count > max(s.tgt.trial)
                     done = true;
                 end
             end
 
-        end
+        end % end execute
 
         function Cleanup(self)
             BailPtb;

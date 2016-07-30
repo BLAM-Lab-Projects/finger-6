@@ -9,13 +9,15 @@ classdef TimedResp < StateMachine
         imgs % images
         keys % keyboard
         feed % keyboard feedback
+        data_summary
+        data_long
+        data_nested
     end
 
     methods
         function self = TimedResp
             self = self@StateMachine;
             self.p.FunctionName = 'TimedResp';
-            % inblock contains own state machine
             self.ref_time = GetSecs;
 
             consts = struct('win_size', [30 30 400 400], ...

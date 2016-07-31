@@ -14,4 +14,4 @@ script:
     - platformio run -e teensy31
 
 notifications:
-email: false
+    email: false

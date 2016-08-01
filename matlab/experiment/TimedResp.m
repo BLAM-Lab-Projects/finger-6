@@ -9,9 +9,10 @@ classdef TimedResp < StateMachine
         imgs % images
         keys % keyboard
         feed % keyboard feedback
-        data_summary
-        data_long
-        data_nested
+        data_summary % for easy analyses (each row is a response)
+        data_long % complete data, including times of onset for everything
+        %data_nested % optional? nested-style data, which allows for varying
+                    % numbers of events per trial
     end
 
     methods

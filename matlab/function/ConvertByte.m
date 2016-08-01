@@ -2,9 +2,12 @@ function out = ConvertByte(mat)
 % Convert vector of bytes from the serial port to a 3xN matrix, N being
 % num_sensors + 1 (1 for the timestamp in microseconds)
 % Strong assumption: Timestamp is 4 bytes, each of the sensors is two
-    time_indices = 1:(4 + 4):length(mat); %add 3 to get end indices
-    sensor1_indices = 5:(4 + 4):length(mat); % add 1 to get end indices
-    sensor2_indices = 7:(4 + 4):length(mat); % *
+    num_sensors = 2;
+    l_m = length(mat);
+    n2 = 4 + 2 * num_sensors;
+    time_indices = 1:n2:l_m; %add 3 to get end indices
+    sensor1_indices = 5:n2:l_m; % add 1 to get end indices
+    sensor2_indices = 7:n2:l_m; % *
 
     times = mat([time_indices; time_indices+1; time_indices+2; time_indices+3]);
     sensor1 = mat([sensor1_indices; sensor1_indices + 1]);

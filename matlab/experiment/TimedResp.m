@@ -41,7 +41,7 @@ classdef TimedResp < StateMachine
                                 'alpha_blending', true);
 
             % add audio
-            snd1 = wavread('misc/sounds/beep.wav');
+            snd1 = GenClick(1046, 0.45, 3); % from ptbutils
             snd2 = wavread('misc/sounds/smw_coin.wav');
 
             s.aud = PsychAudio('mode', 9);
@@ -94,7 +94,7 @@ classdef TimedResp < StateMachine
                             % all pre-trial things
                                 audio_played = false;
                                 trial_time = GetSecs;
-                                audio_time = trial_time + 0.5;
+                                audio_time = trial_time + 0.5; % first beep happens at 1s
                                 img_time = trial_time + s.tgt.image_time()
 
                                 neststate = 'doneprep';
@@ -102,7 +102,7 @@ classdef TimedResp < StateMachine
                             case 'doneprep'
                             % actual 'trial' (sounds blaring, images flashing...)
                                 if loop_time >= audio_time && audio_played
-
+                                    aud.Play(audio_time, 1);
                                     audio_played = true;
                                 end
 

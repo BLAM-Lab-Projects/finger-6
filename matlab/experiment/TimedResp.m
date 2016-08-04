@@ -93,19 +93,12 @@ classdef TimedResp < StateMachine
                             case 'prep'
                             % all pre-trial things
                                 audio_played = false;
-                                trial_time = GetSecs;
-                                audio_time = trial_time + 0.5; % first beep happens at 1s
+                                trial_time = aud.Play(GetSecs + 0.1, 1);
                                 img_time = trial_time + s.tgt.image_time()
 
                                 neststate = 'doneprep';
 
                             case 'doneprep'
-                            % actual 'trial' (sounds blaring, images flashing...)
-                                if loop_time >= audio_time && audio_played
-                                    aud.Play(audio_time, 1);
-                                    audio_played = true;
-                                end
-
                                 if loop_time >= img_time
 
                                 end

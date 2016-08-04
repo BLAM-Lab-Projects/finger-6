@@ -1,7 +1,7 @@
 function main(exp_type, tgt_name)
     addpath(genpath('Psychoobox'));
     addpath(genpath('matlab'));
-    addpath(genpath('ptbutils'));
+    addpath('ptbutils');
 
     try
         if IsOctave

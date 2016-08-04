@@ -42,7 +42,7 @@ classdef TimedResp < StateMachine
 
             % add audio
             snd1 = GenClick(1046, 0.45, 3); % from ptbutils
-            load('misc/sounds/scaled_coin.mat');
+            snd2 = audioread('misc/sounds/scaled_coin.wav');
 
             s.aud = PsychAudio('mode', 9);
             s.aud.AddSlave(1, 'channels', 2);

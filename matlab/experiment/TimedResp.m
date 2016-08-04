@@ -22,7 +22,8 @@ classdef TimedResp < StateMachine
             self.ref_time = GetSecs;
 
             consts = struct('win_size', [30 30 400 400], ...
-                            'reversed', false)
+                            'reversed', false, ...
+                            'beep_half', 0.02);
             self.consts = consts;
 
         end
@@ -42,6 +43,9 @@ classdef TimedResp < StateMachine
 
             % add audio
             snd1 = GenClick(1046, 0.45, 3); % from ptbutils
+            % fourth beep in seconds
+            s.consts.fourth = (length(snd1) - s.consts.beep_half * 44100)/44100;
+
             snd2 = audioread('misc/sounds/scaled_coin.wav');
 
             s.aud = PsychAudio('mode', 9);
@@ -87,20 +91,19 @@ classdef TimedResp < StateMachine
             while ~(GetSecs - s.ref_time > 4200) || done
                 loop_time = GetSecs;
 
+
                 switch state
                     case 'intrial'
                         switch neststate
                             case 'prep'
                             % all pre-trial things
-                                audio_played = false;
-                                trial_time = aud.Play(GetSecs + 0.1, 1);
-                                img_time = trial_time + s.tgt.image_time()
-
+                                trial_time = s.aud.Play(GetSecs + 0.1, 1);
+                                img_time = trial_time + s.consts.fourth * s.tgt.image_time(trial_count);
                                 neststate = 'doneprep';
 
                             case 'doneprep'
                                 if loop_time >= img_time
-
+                                    s.textures.Draw(scrn.pointer, s.tgt.image_index(trial_count));
                                 end
                         end
 
@@ -110,7 +113,7 @@ classdef TimedResp < StateMachine
                         end
 
                     case 'feedback'
-
+                        s.textures.Draw(scrn.pointer, s.tgt.image_index(trial_count));
                         % draw correctness feedback
 
                     case 'between'

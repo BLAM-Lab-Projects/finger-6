@@ -52,8 +52,8 @@ classdef TimedResp < StateMachine
             s.aud.AddSlave(1, 'channels', 2);
             s.aud.AddSlave(2, 'channels', 2);
 
-            s.aud.FillBuffer([snd1; snd1]', 1);
-            s.aud.FillBuffer([snd2; snd2]', 2);
+            s.aud.FillBuffer([snd1; snd1].', 1);
+            s.aud.FillBuffer([snd2; snd2].', 2);
 
             % add images
             if s.tgt.image_type(1)

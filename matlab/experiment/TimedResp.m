@@ -13,6 +13,7 @@ classdef TimedResp < StateMachine
         data_long % complete data, including times of onset for everything
         %data_nested % optional? nested-style data, which allows for varying
                     % numbers of events per trial
+        last_beep
     end
 
     methods
@@ -54,7 +55,7 @@ classdef TimedResp < StateMachine
             % add audio
             snd1 = GenClick(1046, 0.45, 3); % from ptbutils
             % fourth beep in seconds
-            s.consts.fourth = (length(snd1) - s.consts.beep_half * 44100)/44100;
+            s.last_beep = (length(snd1) - s.consts.beep_half * 44100)/44100;
 
             snd2 = audioread('misc/sounds/scaled_coin.wav');
 
@@ -101,13 +102,15 @@ classdef TimedResp < StateMachine
             while ~(GetSecs - s.ref_time > 4200) || done
                 loop_time = GetSecs;
 
+                [press_times, ~, press_array, ...
+                 release_times, ~, release_array] = Check(s.keys);
 
                 switch state
                     case 'intrial'
                         switch neststate
                             case 'prep'
                             % all pre-trial things
-                                trial_time = s.aud.Play(GetSecs + 0.1, 1);
+                                trial_time = s.aud.Play(0, 1);
                                 img_time = trial_time + s.consts.fourth * s.tgt.image_time(trial_count);
                                 neststate = 'doneprep';
 

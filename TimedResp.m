@@ -5,6 +5,7 @@ function out_data = TimedResp(file_name, forces, fullscreen)
 %     data = TimedResp('misc/tgt/day1_block1.tgt', false, false);
 %                           tgt file    force transducers  fullscreen
     try
+        %% Setup
         Screen('Preference', 'Verbosity', 1);
         addpath(genpath('Psychoobox'));
         addpath(genpath('ptbutils'));
@@ -29,14 +30,14 @@ function out_data = TimedResp(file_name, forces, fullscreen)
 					 'rel_x_scale', 0.3, ...
 					 'rel_y_scale', nan);
 		end
-        
+
 
         aud = PobAudio;
 		snd0 = GenClick(1046, 0.45, 3);
 		% 0.02 is the size of one beep (fixed!)
 		last_beep = (length(snd0) - 0.02 * 44100)/44100;
 		snd1 = audioread('misc/sounds/scaled_coin.wav');
-		
+
 		aud.Add('slave', 1);
 		aud.Add('slave', 2);
 		aud.Add('buffer', 1, 'audio', [snd0; snd0]);
@@ -44,7 +45,7 @@ function out_data = TimedResp(file_name, forces, fullscreen)
 		aud.Map(1, 1);
 		aud.Map(2, 2);
         %time_out = aud.Play(index, time);
-		
+
         info_txt = PobText('size', 30, ...
 		                   'color', [255 255 255], ...
 						   'rel_x_pos', 0.5, ...
@@ -77,6 +78,58 @@ function out_data = TimedResp(file_name, forces, fullscreen)
         resp_feedback.Register(win.pointer);
         resp_feedback.Prime();
         % need to prime resp_feedback after each change??
+        done = false;
+        trial_counter = 1;
+        state = 'pretrial';
+
+
+        % event loop/state machine
+        while ~done
+            if trial_counter > length(tgt.trial)
+                % end of experiment
+                break;
+            end
+            [press_time, presses, release_time, releases] = kbrd.Check;
+            if forces
+                % figure out presses (need to compare current press data w/previous)
+            end
+            if ~isnan(presses)
+                resp_feedback.SetFill(find(presses), 'green');
+            end
+            if ~isnan(releases)
+                resp_feedback.SetFill(find(releases), 'black');
+            end
+
+            switch state
+            case 'pretrial'
+                ref_trial_time = aud.Play(1, GetSecs + 0.5 * win.flip_interval);
+                state = 'intrial';
+            case 'intrial'
+                if GetSecs >= ref_trial_time + 0.5 + tgt.image_time(trial_counter)
+                    if tgt.image_index ~= -1
+                        imgs.Draw(tgt.image_index(trial_counter));
+                    end
+                end
+
+                if GetSecs >= ref_trial_time + last_beep + 0.2
+                    state = 'feedback';
+                end
+            case 'feedback'
+                % feedback for correct index
+                if tgt.image_index ~= -1
+                    if tgt.image_index(trial_counter) == first_press % nonexistant
+                        resp_feedback.SetFill(first_press, 'green');
+                    else
+                        resp_feedback.SetFill(first_press, 'red');
+                        resp_feedback.SetFrame(tgt.image_index(trial_counter), 'green');
+                    end
+
+
+                end
+
+            end % end state machine
+
+        end % end event loop, cleanup
 
 
     catch ERR

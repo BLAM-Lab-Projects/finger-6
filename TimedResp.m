@@ -44,6 +44,9 @@ function out_data = TimedResp(file_name, forces, fullscreen)
 		aud.Add('buffer', 2, 'audio', [snd1, snd1]');
 		aud.Map(1, 1);
 		aud.Map(2, 2);
+        % audio warmup
+        aud.Play(1, 0);
+        aud.Stop(1);
         %time_out = aud.Play(index, time);
 
         info_txt = PobText('size', 30, ...
@@ -82,6 +85,8 @@ function out_data = TimedResp(file_name, forces, fullscreen)
         trial_counter = 1;
         state = 'pretrial';
 
+        window_time = win.Flip();
+
 
         % event loop/state machine
         while ~done
@@ -102,10 +107,12 @@ function out_data = TimedResp(file_name, forces, fullscreen)
 
             switch state
             case 'pretrial'
-                ref_trial_time = aud.Play(1, GetSecs + 0.5 * win.flip_interval);
+                % schedule audio for next window flip onset
+                aud.Play(1, window_time + win.flip_interval);
                 state = 'intrial';
             case 'intrial'
-                if GetSecs >= ref_trial_time + 0.5 + tgt.image_time(trial_counter)
+                % image_time is a **proportion of the last beep**
+                if GetSecs >= ref_trial_time + tgt.image_time(trial_counter)*last_beep
                     if tgt.image_index ~= -1
                         imgs.Draw(tgt.image_index(trial_counter));
                     end
@@ -129,16 +136,20 @@ function out_data = TimedResp(file_name, forces, fullscreen)
 
             end % end state machine
 
+            window_time = win.Flip(window_time + 0.5 * win.flip_interval);
+
         end % end event loop, cleanup
 
 
     catch ERR
+        % try to clean up resources
         sca;
         try
             PsychPortAudio('Close');
         catch
-            warning('No audio device open.');
+            disp('No audio device open.');
         end
+        KbQueueRelease;
         rethrow(ERR);
     end
 end

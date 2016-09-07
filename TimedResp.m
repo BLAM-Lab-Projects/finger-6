@@ -13,13 +13,13 @@ function out_data = TimedResp(file_name, forces, fullscreen)
 
         imgs = PobImage;
         if tgt.image_type(1)
-            subdir = 'shapes/';
+            img_dir = 'misc/images/shapes/';
+            img_names = dir('misc/images/shapes/*.png');
         else
-            subdir = 'hands/';
+            img_dir = 'misc/images/hands/';
+            img_names = dir('misc/images/hands/*.jpg');
         end
-        % Tack on sub-subdir here if need separate groups
-        img_dir = ['misc/images/', subdir];
-        img_names = dir([img_dir, '/*.jpg']);
+
 		for ii = 1:length(img_names)
             tmpimg = imcomplement(...
                 imread([img_dir, img_names(ii).name])...
@@ -49,7 +49,10 @@ function out_data = TimedResp(file_name, forces, fullscreen)
         aud.Stop(1);
         %time_out = aud.Play(index, time);
 
-        info_txt = PobText('size', 30, ...
+        helptext = ['This experiment is\nTimed Response.\n', ...
+                    'Here is more text'];
+
+        info_txt = PobText('value', helptext, 'size', 30, ...
 		                   'color', [255 255 255], ...
 						   'rel_x_pos', 0.5, ...
 						   'rel_y_pos', 0.5);
@@ -62,7 +65,7 @@ function out_data = TimedResp(file_name, forces, fullscreen)
         resp_feedback = BlamKeyFeedback(length(keybrd.valid_indices), ...
                                         'fill_color', [0 0 0], ...
                                         'frame_color', [255 255 255], ...
-                                        'rel_x_scale', 0.06);
+                                        'rel_x_scale', 0.1);
 
 
         if fullscreen
@@ -80,10 +83,26 @@ function out_data = TimedResp(file_name, forces, fullscreen)
         info_txt.Register(win.pointer);
         resp_feedback.Register(win.pointer);
         resp_feedback.Prime();
+        resp_feedback.Draw();
+
+        info_txt.Draw();
+        win.Flip();
+        WaitSecs(2);
+
+        for ii = 1:3
+            helptext = ['Experiment starting in\n', ...
+                        num2str(4 - ii), ' seconds'];
+            info_txt.Set('value', helptext);
+            info_txt.Draw();
+            resp_feedback.Draw();
+            win.Flip;
+            WaitSecs(1);
+        end
         % need to prime resp_feedback after each change??
         done = false;
         trial_counter = 1;
         state = 'pretrial';
+        first_press = nan;
 
         window_time = win.Flip();
 
@@ -100,42 +119,58 @@ function out_data = TimedResp(file_name, forces, fullscreen)
             end
             if ~isnan(presses)
                 resp_feedback.SetFill(find(presses), 'green');
+                if state == 'intrial' && isnan(first_press)
+                    first_press = find(presses);
+                    time_first_press = press_time;
+                end
             end
             if ~isnan(releases)
                 resp_feedback.SetFill(find(releases), 'black');
             end
 
             switch state
-            case 'pretrial'
-                % schedule audio for next window flip onset
-                aud.Play(1, window_time + win.flip_interval);
-                state = 'intrial';
-            case 'intrial'
-                % image_time is a **proportion of the last beep**
-                if GetSecs >= ref_trial_time + tgt.image_time(trial_counter)*last_beep
+                case 'pretrial'
+                    % schedule audio for next window flip onset
+                    aud.Play(1, window_time + win.flip_interval);
+                    state = 'intrial';
+                case 'intrial'
+                    % image_time is a **proportion of the last beep**
+                    if GetSecs >= ref_trial_time + tgt.image_time(trial_counter)*last_beep
+                        if tgt.image_index ~= -1
+                            imgs.Draw(tgt.image_index(trial_counter));
+                        end
+                    end
+
+                    if GetSecs >= ref_trial_time + last_beep + 0.2
+                        state = 'feedback';
+                        start_feedback = GetSecs;
+                        stop_feedback = start_feedback + 0.2;
+                    end
+                case 'feedback'
+                    % feedback for correct index
                     if tgt.image_index ~= -1
-                        imgs.Draw(tgt.image_index(trial_counter));
+                        if tgt.image_index(trial_counter) == first_press % nonexistant
+                            resp_feedback.SetFill(first_press, 'green');
+                        else
+                            resp_feedback.SetFill(first_press, 'red');
+                            resp_feedback.SetFrame(tgt.image_index(trial_counter), 'green');
+                        end
+
+                        if GetSecs >= stop_feedback
+                            state = 'posttrial';
+                            trial_counter = trial_counter + 1;
+                            first_press = nan;
+                            resp_feedback.Reset;
+                            next_trial = GetSecs + 0.5;
+                        end
+                    end % end feedback
+                case 'posttrial'
+                    if GetSecs >= next_trial
+                        state = 'pretrial';
                     end
-                end
-
-                if GetSecs >= ref_trial_time + last_beep + 0.2
-                    state = 'feedback';
-                end
-            case 'feedback'
-                % feedback for correct index
-                if tgt.image_index ~= -1
-                    if tgt.image_index(trial_counter) == first_press % nonexistant
-                        resp_feedback.SetFill(first_press, 'green');
-                    else
-                        resp_feedback.SetFill(first_press, 'red');
-                        resp_feedback.SetFrame(tgt.image_index(trial_counter), 'green');
-                    end
-
-
-                end
-
             end % end state machine
-
+            resp_feedback.Prime();
+            resp_feedback.Draw();
             window_time = win.Flip(window_time + 0.5 * win.flip_interval);
 
         end % end event loop, cleanup

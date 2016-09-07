@@ -1,16 +1,16 @@
-function WriteTrTgt(out_path, varargin)
+function WriteRtTgt(out_path, varargin)
     % copy-paste test:
 	% WriteTrTgt('~/Documents/BLAM/finger-5/misc/tfiles/');
     % More thorough example:
     % WriteTrTgt('~/Documents/BLAM/finger-5/misc/tfiles/', ...
     %            'day', 2, 'block', 4, 'swapped', [1 3],...
     %            'image_type', 1, 'repeats', 5, 'easy_block', 0,...
-    %            'ind_finger', 7:10, 'ind_img', 1:4, 'times', 0.4:0.05:0.95)
+    %            'ind_finger', 7:10, 'ind_img', 1:4)
 
     opts = struct('day', 1, 'block', 1, 'swapped', 0, ...
                   'image_type', 0, 'repeats', 3, ...
-                  'easy_block', 0, 'ind_finger', 1:5, ...
-                  'ind_img', 1:5, 'times', 0.4:0.05:0.95);
+                  'ind_finger', 1:5, ...
+                  'ind_img', 1:5);
     opts = CheckInputs(opts, varargin{:});
 
     day = opts.day;
@@ -18,10 +18,9 @@ function WriteTrTgt(out_path, varargin)
     swapped = opts.swapped;
     image_type = opts.image_type;
     repeats = opts.repeats;
-    easy_block = opts.easy_block;
     ind_finger = opts.ind_finger;
     ind_img = opts.ind_img;
-    times = opts.times;
+    times = 1;
 
     if length(ind_finger) ~= length(ind_img)
         error('Cannot handle weird mappings, make sure ind_finger and ind_img are the same length.');
@@ -63,10 +62,6 @@ function WriteTrTgt(out_path, varargin)
     combos = combos2;
     combo_size = size(combos, 1);
 
-    if easy_block
-        combos(:, 1) = min(times);
-    end
-
     if any(swapped > 0) % if not zero
         combos(:, 4) = swapped(1);
         combos(:, 5) = swapped(2);
@@ -77,30 +72,19 @@ function WriteTrTgt(out_path, varargin)
         swapped2 = 0;
     end
     % combos is (times, finger, image, swap1, swap2)
-
-    % add catch trials
-    num_catch = floor(combo_size/10);
-    randind = randi([-2 2], 1, num_catch);
-    catchind = (10:10:combo_size) + randind;
-    if catchind(end) > combo_size
-        catchind(end) = combo_size;
-    end
-    % time, finger, img_time, indices of two swapped images
-    catch_trial = [0 -1 -1 combos(1, 4:5)];
-    combos = insertrows(combos, catch_trial, catchind);
+    combos(:, 1) = [];
     combo_size = size(combos, 1);
 
     final_output = [repmat(day, combo_size, 1) ...
                     repmat(block, combo_size, 1) ...
                     (1:combo_size)' ... % trials
-                    repmat(easy_block, combo_size, 1) ...
                     repmat(swapped2, combo_size, 1) ...
                     repmat(image_type, combo_size, 1) combos];
 
-    filename = ['tr_','dy',num2str(day), '_bk', num2str(block),...
+    filename = ['rt_','dy',num2str(day), '_bk', num2str(block),...
                 '_sw', num2str(swapped2), '_sh', num2str(image_type), '.tgt'];
-    headers = {'day', 'block', 'trial', 'easy', ...
-               'swapped', 'image_type','image_time', 'finger_index',  ...
+    headers = {'day', 'block', 'trial', ...
+               'swapped', 'image_type', 'finger_index',  ...
                'image_index', 'swap_index_1', 'swap_index_2'};
 
 	fid = fopen([out_path, filename], 'wt');

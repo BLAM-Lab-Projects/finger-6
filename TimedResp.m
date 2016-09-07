@@ -153,7 +153,7 @@ function out_data = TimedResp(file_name, forces, fullscreen)
                             resp_feedback.SetFill(first_press, 'green');
                         else
                             resp_feedback.SetFill(first_press, 'red');
-                            resp_feedback.SetFrame(tgt.image_index(trial_counter), 'green');
+                            resp_feedback.SetFrame(tgt.finger_index(trial_counter), 'green');
                         end
 
                         if GetSecs >= stop_feedback

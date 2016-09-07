@@ -149,7 +149,7 @@ function out_data = TimedResp(file_name, forces, fullscreen)
                 case 'feedback'
                     % feedback for correct index
                     if tgt.image_index ~= -1
-                        if tgt.image_index(trial_counter) == first_press % nonexistant
+                        if tgt.finger_index(trial_counter) == first_press % nonexistant
                             resp_feedback.SetFill(first_press, 'green');
                         else
                             resp_feedback.SetFill(first_press, 'red');

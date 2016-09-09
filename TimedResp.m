@@ -1,4 +1,4 @@
-function out_data = TimedResp(id, file_name, forces, fullscreen)
+function out_data = TimedResp(id, file_name, fullscreen)
 % strong assumptions made (5 choice only!)
 %
 % Example:
@@ -39,17 +39,11 @@ function out_data = TimedResp(id, file_name, forces, fullscreen)
                 % end of experiment
                 break;
             end
-            if forces
-                % figure out presses (need to compare current press data w/previous)
-            else % keyboard
-                [press_time, presses, release_time, releases] = kbrd.Check;
-            end
+
+            [~, presses, ~, releases] = kbrd.Check;
+
             if ~isnan(presses)
                 resp_feedback.SetFill(find(presses), 'green');
-                if state == 'intrial' && isnan(first_press)
-                    first_press = find(presses);
-                    time_first_press = press_time;
-                end
             end
             if ~isnan(releases)
                 resp_feedback.SetFill(find(releases), 'black');
@@ -57,6 +51,8 @@ function out_data = TimedResp(id, file_name, forces, fullscreen)
 
             switch state
                 case 'pretrial'
+                    % Dump non-relevant data elsewhere
+                    [~, ~, pre_data] = kbrd.CheckMid();
                     % schedule audio for next window flip onset
                     aud.Play(1, window_time + win.flip_interval);
                     state = 'intrial';
@@ -69,6 +65,7 @@ function out_data = TimedResp(id, file_name, forces, fullscreen)
                     end
 
                     if GetSecs >= ref_trial_time + last_beep + 0.2
+                        [first_press, press_time, post_data] = kbrd.CheckMid();
                         state = 'feedback';
                         start_feedback = GetSecs;
                         stop_feedback = start_feedback + 0.2;
@@ -98,7 +95,9 @@ function out_data = TimedResp(id, file_name, forces, fullscreen)
             end % end state machine
             resp_feedback.Prime();
             resp_feedback.Draw();
-            window_time = win.Flip(window_time + 0.5 * win.flip_interval);
+            % optimize drawing?
+            %Screen('DrawingFinished', win.pointer);
+            window_time = win.Flip(window_time + 0.8 * win.flip_interval);
 
         end % end event loop, cleanup
 

@@ -4,7 +4,7 @@
 addpath(genpath('Psychoobox'));
 addpath(genpath('ptbutils'));
 tgt = ParseTgt(file_name, ',');
-tgt = struct2table(tgt); % R2013b!
+tgt = struct2table(tgt); % R2013b ++!
 
 %% Set up screen
 Screen('Preference', 'Verbosity', 1);
@@ -66,14 +66,10 @@ info_txt = PobText('value', helptext, 'size', 30, ...
                    'rel_x_pos', 0.5, ...
                    'rel_y_pos', 0.5);
 
-%% Set up responses
-if forces
-    error('Add force transducers.');
-    % keybrd = BlamForces(6:10);
-else
-    keybrd = BlamKeyboard(6:10);
-end
-resp_feedback = BlamKeyFeedback(length(keybrd.valid_indices), ...
+%% Set up responses & feedback
+kbrd = BlamForceboard(6:10);
+
+resp_feedback = BlamKeyFeedback(length(kbrd.valid_indices), ...
                                 'fill_color', [0 0 0], ...
                                 'frame_color', [255 255 255], ...
                                 'rel_x_scale', 0.1);

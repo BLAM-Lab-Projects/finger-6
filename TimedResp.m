@@ -79,15 +79,17 @@ function out_data = TimedResp(id, file_name, fullscreen)
                             resp_feedback.SetFill(first_press, 'red');
                             resp_feedback.SetFrame(tgt.finger_index(trial_counter), 'green');
                         end
+                    end
 
-                        if GetSecs >= stop_feedback
-                            state = 'posttrial';
-                            trial_counter = trial_counter + 1;
-                            first_press = nan;
-                            resp_feedback.Reset;
-                            next_trial = GetSecs + 0.5;
-                        end
-                    end % end feedback
+                    % feedback for correct timing
+
+                    if GetSecs >= stop_feedback
+                        state = 'posttrial';
+                        trial_counter = trial_counter + 1;
+                        first_press = nan;
+                        resp_feedback.Reset;
+                        next_trial = GetSecs + 0.5;
+                    end
                 case 'posttrial'
                     if GetSecs >= next_trial
                         state = 'pretrial';

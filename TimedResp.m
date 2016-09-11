@@ -1,4 +1,4 @@
-function out_data = TimedResp(id, file_name, fullscreen)
+function dat = TimedResp(id, file_name, fullscreen)
 % strong assumptions made (5 choice only!)
 %
 % Example:
@@ -32,6 +32,8 @@ function out_data = TimedResp(id, file_name, fullscreen)
         first_press = nan;
 
         window_time = win.Flip();
+        t_rel = window_time;
+        
 
         % event loop/state machine
         while ~done
@@ -52,15 +54,16 @@ function out_data = TimedResp(id, file_name, fullscreen)
             switch state
                 case 'pretrial'
                     % Dump non-relevant data elsewhere
-                    [~, ~, pre_data] = kbrd.CheckMid();
+                    [~, ~, dat.trial(trial_counter).between_data] = kbrd.CheckMid();
                     % schedule audio for next window flip onset
-                    aud.Play(1, window_time + win.flip_interval);
+                    dat.trial(ii).aud. = Play(1, window_time + win.flip_interval);
                     state = 'intrial';
                 case 'intrial'
                     % image_time is a **proportion of the last beep**
                     if GetSecs >= ref_trial_time + tgt.image_time(trial_counter)*last_beep
                         if tgt.image_index ~= -1
                             imgs.Draw(tgt.image_index(trial_counter));
+                            dat.trial(trial_counter).
                         end
                     end
 

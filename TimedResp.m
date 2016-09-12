@@ -27,21 +27,22 @@ function dat = TimedResp(id, file_name, fullscreen)
         end
         % need to prime resp_feedback after each change??
         done = false;
-        trial_counter = 1;
+        trial_count = 1;
         state = 'pretrial';
         first_press = nan;
 
         window_time = win.Flip();
-        t_rel = window_time;
-        
+        block_start = window_time; % use
+        dat.block_start = window_time;       
 
         % event loop/state machine
         while ~done
-            if trial_counter > length(tgt.trial)
+            if trial_count > length(tgt.trial)
                 % end of experiment
                 break;
             end
 
+            % short-term (and unsophisticated) check for keyboard presses
             [~, presses, ~, releases] = kbrd.Check;
 
             if ~isnan(presses)
@@ -50,20 +51,22 @@ function dat = TimedResp(id, file_name, fullscreen)
             if ~isnan(releases)
                 resp_feedback.SetFill(find(releases), 'black');
             end
-
+            
+            % begin state machine
             switch state
                 case 'pretrial'
-                    % Dump non-relevant data elsewhere
-                    [~, ~, dat.trial(trial_counter).between_data] = kbrd.CheckMid();
+                    % Dump non-relevant data elsewhere (but still
+                    % accessible)
+                    [~, ~, dat.trial(trial_count).between_data] = kbrd.CheckMid();
                     % schedule audio for next window flip onset
-                    dat.trial(ii).rel_start = Play(1, window_time + win.flip_interval);
+                    dat.trial(trial_count).trial_start = Play(1, window_time + win.flip_interval) - block_start;
                     state = 'intrial';
                 case 'intrial'
-                    % image_time is a **proportion of the last beep**
-                    if GetSecs >= ref_trial_time + tgt.image_time(trial_counter)*last_beep
+                    % display the image
+                    if GetSecs >= block_start + dat.trial(trial_count).time_image
                         if tgt.image_index ~= -1
-                            imgs.Draw(tgt.image_index(trial_counter));
-                            dat.trial(trial_counter).
+                            imgs.Draw(tgt.image_index(trial_count));
+                            dat.trial(trial_count).time_image
                         end
                     end
 
@@ -76,11 +79,11 @@ function dat = TimedResp(id, file_name, fullscreen)
                 case 'feedback'
                     % feedback for correct index
                     if tgt.image_index ~= -1
-                        if tgt.finger_index(trial_counter) == first_press % nonexistant
+                        if tgt.finger_index(trial_count) == first_press % nonexistant
                             resp_feedback.SetFill(first_press, 'green');
                         else
                             resp_feedback.SetFill(first_press, 'red');
-                            resp_feedback.SetFrame(tgt.finger_index(trial_counter), 'green');
+                            resp_feedback.SetFrame(tgt.finger_index(trial_count), 'green');
                         end
                     end
 
@@ -88,7 +91,7 @@ function dat = TimedResp(id, file_name, fullscreen)
 
                     if GetSecs >= stop_feedback
                         state = 'posttrial';
-                        trial_counter = trial_counter + 1;
+                        trial_count = trial_count + 1;
                         first_press = nan;
                         resp_feedback.Reset;
                         next_trial = GetSecs + 0.5;

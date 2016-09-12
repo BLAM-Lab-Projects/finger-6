@@ -89,8 +89,9 @@ frames(1:350) = struct('push_data', [], ... % complete push data (timestamps, et
                        'beep4', 0, ... % 4th beep during this frame?
                        'time_frame', []); % Time relative to block start
 
-trial(1:length(tgt.trial)) = struct('time_start', [], ... % trial time relative to the start of the experiment
+trial(1:length(tgt.trial)) = struct('trial_start', [], ... % trial time relative to the start of the experiment
                       'time_image', [], ... % image onset relative to time_start
+                      'prop_image', [], ... % time of image proportional to last beep
                       'time_press', [], ... % time of press relative to time_start
                       'time_preparation', [], ... % time_press - time_image
                       'index_image', [], ... % image index
@@ -99,13 +100,14 @@ trial(1:length(tgt.trial)) = struct('time_start', [], ... % trial time relative 
                       'correct', [], ... % index_press == index_finger
                       'frames', frames, ...
                       'between_data', [], ... % data dump for between trials
-                      'within_data', []); % data dump for within the trial
+                      'within_data', [], ... % data dump for within the trial
+                      'sub_swap', []); 
 % fill in trial-specific information
 for ii = 1:length(tgt.trial)
-    trial(ii).image_index = tgt.image_index(ii);
-    trial(ii).finger_index = tgt.finger_index(ii);
-    trial(ii).prop_image_time = tgt.image_time(ii);
-    trial(ii).rel_image_time = tgt.image_time(ii)*last_beep; % relative to trial start
+    trial(ii).index_image = tgt.image_index(ii);
+    trial(ii).index_finger = tgt.finger_index(ii);
+    trial(ii).prop_image = tgt.image_time(ii);
+    trial(ii).time_image = tgt.image_time(ii)*last_beep; % relative to trial start
     if (tgt.image_index(ii) == tgt.swap_index_1(ii)) || (tgt.image_index(ii) == tgt.swap_index_2(ii))
         trial(ii).sub_swap = true;
     else
@@ -116,6 +118,7 @@ dat = struct('trial', trial, ...
              'id', [], ...
              'shapes', [], ...
              'swaps', [], ...
-             'time_start', [], ... % absolute start time
-             'tgt', table2struct(tgt));
+             'block_start', [], ... % absolute start time
+             'tgt', table2struct(tgt), ...
+             'last_beep', last_beep); % time of the last beep, relative to the onset of audio
 clear trial frame

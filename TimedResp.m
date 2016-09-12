@@ -56,7 +56,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                     % Dump non-relevant data elsewhere
                     [~, ~, dat.trial(trial_counter).between_data] = kbrd.CheckMid();
                     % schedule audio for next window flip onset
-                    dat.trial(ii).aud. = Play(1, window_time + win.flip_interval);
+                    dat.trial(ii).rel_start = Play(1, window_time + win.flip_interval);
                     state = 'intrial';
                 case 'intrial'
                     % image_time is a **proportion of the last beep**

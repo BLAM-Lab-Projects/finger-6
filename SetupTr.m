@@ -82,23 +82,24 @@ imgs.Prime();
 info_txt.Register(win.pointer);
 resp_feedback.Register(win.pointer);
 
-% time is the Psychtoolbox time of the frame, push_data is the raw
-% data from the force transducers, state is the state machine state,
-% image is whether the image appears in this frame or not,
-frame(1:300) = struct('time', [], 'push_data', [], 'state', '', ...
-               'beep4', false, 'image', false);
+frames(1:350) = struct('push_data', [], ... % complete push data (timestamps, etc...)
+                       ...                  % timestamps relative to the experiment starts
+                       'state', [],... % state at the current frame
+                       'image', 0, ... % image on during this frame?
+                       'beep4', 0, ... % 4th beep during this frame?
+                       'time_frame', []); % Time relative to block start
 
-% frame is frame # in trial, rel_start is the start of the trial relative to
-% the beginning of the block, resp1 is the first response, t_resp1 is the time
-% of that response, image_index is the image shown (this is swapped),
-% finger_index is the requested finger, correct is whether resp1 == finger_index,
-% sub_swap is whether this particular trial contains a swapped image (redundant)
-% rel_image_time*last_beep is the time of the image presentation
-trial(1:length(tgt.trial)) = struct('frame', frame, 'trial_start', [], ...
-                                    'resp1', [], 't_resp1', [], 'image_index', ...
-                                    [], 'rel_image_time', [], 'finger_index', [], ...
-                                    'correct', [], 'sub_swap', [], 'prop_image_time', [],...
-                                    'between_data', []);
+trial(1:length(tgt.trial)) = struct('time_start', [], ... % trial time relative to the start of the experiment
+                      'time_image', [], ... % image onset relative to time_start
+                      'time_press', [], ... % time of press relative to time_start
+                      'time_preparation', [], ... % time_press - time_image
+                      'index_image', [], ... % image index
+                      'index_press', [], ...  % which finger pressed
+                      'index_finger', [], ...
+                      'correct', [], ... % index_press == index_finger
+                      'frames', frames, ...
+                      'between_data', [], ... % data dump for between trials
+                      'within_data', []); % data dump for within the trial
 % fill in trial-specific information
 for ii = 1:length(tgt.trial)
     trial(ii).image_index = tgt.image_index(ii);
@@ -111,7 +112,10 @@ for ii = 1:length(tgt.trial)
         trial(ii).sub_swap = false;
     end
 end
-
-dat = struct('trial', trial, 'id', id, 'start_time', [],...
-             'shapes', tgt.image_type(1), 'tgt', table2struct(tgt));
+dat = struct('trial', trial, ...
+             'id', [], ...
+             'shapes', [], ...
+             'swaps', [], ...
+             'time_start', [], ... % absolute start time
+             'tgt', table2struct(tgt));
 clear trial frame

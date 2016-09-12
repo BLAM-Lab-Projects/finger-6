@@ -60,18 +60,21 @@ function dat = TimedResp(id, file_name, fullscreen)
                     [~, ~, dat.trial(trial_count).between_data] = kbrd.CheckMid();
                     % schedule audio for next window flip onset
                     dat.trial(trial_count).trial_start = Play(1, window_time + win.flip_interval) - block_start;
+                    trial_start = dat.trial(trial_count).trial_start;
                     state = 'intrial';
                 case 'intrial'
                     % display the image
-                    if GetSecs >= block_start + dat.trial(trial_count).time_image
+                    if GetSecs - block_start >= dat.trial(trial_count).time_image
                         if tgt.image_index ~= -1
                             imgs.Draw(tgt.image_index(trial_count));
-                            dat.trial(trial_count).time_image
+                            dat.trial(trial_count).time_image_real = window_time + win.flip_interval - trial_start;
                         end
                     end
 
                     if GetSecs >= ref_trial_time + last_beep + 0.2
-                        [first_press, press_time, post_data] = kbrd.CheckMid();
+                        [first_press, time_press, post_data] = kbrd.CheckMid();
+                        dat.trial(trial_count).index_press = first_press;
+                        dat.trial(trial_count).time_press = time_press - ;
                         state = 'feedback';
                         start_feedback = GetSecs;
                         stop_feedback = start_feedback + 0.2;

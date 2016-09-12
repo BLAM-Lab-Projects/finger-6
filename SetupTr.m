@@ -91,6 +91,7 @@ frames(1:350) = struct('push_data', [], ... % complete push data (timestamps, et
 
 trial(1:length(tgt.trial)) = struct('trial_start', [], ... % trial time relative to the start of the experiment
                       'time_image', [], ... % image onset relative to time_start
+                      'time_image_real', [], ... % image onset, accounting for rounding
                       'prop_image', [], ... % time of image proportional to last beep
                       'time_press', [], ... % time of press relative to time_start
                       'time_preparation', [], ... % time_press - time_image

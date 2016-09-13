@@ -83,7 +83,6 @@ resp_feedback.Register(win.pointer);
 frames(1:350) = struct('push_data', [], ... % complete push data (timestamps, etc...)
                        ...                  % timestamps relative to the experiment starts
                        'state', [],... % state at the current frame
-                       'image', 0, ... % image on during this frame?
                        'time_frame', []); % Time relative to block start
 
 trial(1:length(tgt.trial)) = struct('trial_start', [], ... % trial time relative to the start of the experiment

@@ -33,6 +33,7 @@ function dat = FreeResp(id, file_name, fullscreen)
         substate = 'allgood'; % allgood, doghouse (ignore responses)
         first_press = nan;
         num_tries = 1; % number of guesses attempted
+        c_c_combo = 1;
 
         window_time = win.Flip();
         block_start = window_time; % use
@@ -70,6 +71,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                                     resp_feedback.SetFill(kbrd.valid_indices(logical(presses)), 'green');
                                     wrong = false;
                                     state = 'feedback';
+                                    feedback_time = GetSecs + 0.2;
                                 else
                                     % only allow a few guesses
                                     if num_tries < 3
@@ -82,6 +84,8 @@ function dat = FreeResp(id, file_name, fullscreen)
                                     else 
                                         wrong = true;
                                         state = 'feedback';
+                                        feedback_time = GetSecs + 0.2;
+
                                     end
                                 end
                                 
@@ -98,8 +102,23 @@ function dat = FreeResp(id, file_name, fullscreen)
                     
                 case 'feedback'
                     if wrong
+                        c_c_combo = 1;
+                        resp_feedback.SetFill(find(tgt.trial(trial_count).index_finger == kbrd.valid_indices), 'blue');
                     else
+                        resp_feedback.SetFill(kbrd.valid_indices(logical(presses)), 'green');
+                        if num_tries == 1
+                            c_c_combo = c_c_combo + 1;
+                            if c_c_combo > 8
+                                c_c_combo = 8;
+                            end
+                            aud.Play(c_c_combo + 1, 0);
+                        end
                     end
+                    
+                    if GetSecs >= feedback_time
+                        state = 'pretrial';
+                    end
+                    
                     
             end % end state machine
             resp_feedback.Prime();

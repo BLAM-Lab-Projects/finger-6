@@ -4,7 +4,7 @@ function dat = TimedResp(id, file_name, fullscreen)
 % Example:
 %     data = TimedResp('misc/tgt/day1_block1.tgt', false, false);
 %                           tgt file    force transducers  fullscreen
-    try
+%     try
         %% Setup
 
         SetupTr;
@@ -31,10 +31,12 @@ function dat = TimedResp(id, file_name, fullscreen)
         frame_count = 1;
         state = 'pretrial';
         first_press = nan;
+        tmp_image = 0;
 
         window_time = win.Flip();
         block_start = window_time; % use
-        dat.block_start = window_time;       
+        dat.block_start = window_time;     
+        kbrd.Start;
 
         % event loop/state machine
         while ~done
@@ -60,7 +62,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                     % accessible)
                     [~, ~, dat.trial(trial_count).between_data] = kbrd.CheckMid();
                     % schedule audio for next window flip onset
-                    trial_start = Play(1, window_time + win.flip_interval);
+                    trial_start = aud.Play(1, window_time + win.flip_interval);
                     dat.trial(trial_count).trial_start = trial_start - block_start;
                     state = 'intrial';
                 case 'intrial'
@@ -71,7 +73,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                             imgs.Draw(tgt.image_index(trial_count));
                             % figure out the actual time of stimulus
                             % presentation
-                            dat.trial(trial_count).time_image_real = window_time + win.flip_interval - trial_start;
+                            dat.trial(trial_count).time_image_real = GetSecs - trial_start;
                         end
                     end
                     
@@ -88,7 +90,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                         % handle catch trial 'correctness'
                         if tgt.image_index(trial_count) ~= -1
                             dat.trial(trial_count).catch_trial = false;
-                            dat.trial(trial_count).correct = first_press == tgt.trial(trial_count).index_finger;
+                            dat.trial(trial_count).correct = first_press == tgt.finger_index(trial_count);
                         else
                             dat.trial(trial_count).catch_trial = true;
                             dat.trial(trial_count).correct = nan;
@@ -100,12 +102,15 @@ function dat = TimedResp(id, file_name, fullscreen)
                     end
                 case 'feedback'
                     % feedback for correct index
+                    aud.Stop(1);
                     if tgt.image_index ~= -1
                         if dat.trial(trial_count).correct || ...
                                 isnan(dat.trial(trial_count).correct) % nonexistant
                             resp_feedback.SetFill(first_press, 'green');
                         else
-                            resp_feedback.SetFill(first_press, 'red');
+                            if ~isnan(first_press)
+                                resp_feedback.SetFill(first_press, 'red');
+                            end
                             resp_feedback.SetFrame(tgt.finger_index(trial_count), 'green');
                         end
                     end
@@ -137,34 +142,40 @@ function dat = TimedResp(id, file_name, fullscreen)
             % optimize drawing?
             %Screen('DrawingFinished', win.pointer);
             window_time = win.Flip(window_time + 0.8 * win.flip_interval);
-            frame_count = frame_count + 1;
-            pause(1e-7);
+            pause(1e-5);
             
             dat.trial(trial_count).frames(frame_count).push_data = kbrd.short_term;
             dat.trial(trial_count).frames(frame_count).state = state;
             dat.trial(trial_count).frames(frame_count).image = tmp_image;
             tmp_image = 0;
             dat.trial(trial_count).frames(frame_count).time_frame = window_time;
+            frame_count = frame_count + 1;
+
             
         end % end event loop, cleanup
         
         sca;
         PsychPortAudio('Close');
+        kbrd.Stop;
         kbrd.Close;
         aud.Close;
         imgs.Close;
         win.Close;
 
-
-    catch ERR
-        % try to clean up resources
-        sca;
-        try
-            PsychPortAudio('Close');
-        catch
-            disp('No audio device open.');
-        end
-        KbQueueRelease;
-        rethrow(ERR);
-    end
+% 
+%     catch ERR
+%         % try to clean up resources
+%         sca;
+%         try 
+%             kbrd.Close;
+%         catch
+%             disp('No keyboard open');
+%         end
+%         try
+%             PsychPortAudio('Close');
+%         catch
+%             disp('No audio device open.');
+%         end
+%         rethrow(ERR);
+%     end
 end

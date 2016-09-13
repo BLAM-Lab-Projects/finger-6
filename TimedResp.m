@@ -32,6 +32,7 @@ function dat = TimedResp(id, file_name, fullscreen)
         state = 'pretrial';
         first_press = nan;
         tmp_image = 0;
+        save_time = false;
 
         window_time = win.Flip();
         block_start = window_time; % use
@@ -73,7 +74,10 @@ function dat = TimedResp(id, file_name, fullscreen)
                             imgs.Draw(tgt.image_index(trial_count));
                             % figure out the actual time of stimulus
                             % presentation
-                            dat.trial(trial_count).time_image_real = GetSecs - trial_start;
+                            if save_time
+                                save_time = false;
+                                dat.trial(trial_count).time_image_real = window_time + win.flip_interval - trial_start;
+                            end
                         end
                     end
                     
@@ -87,6 +91,8 @@ function dat = TimedResp(id, file_name, fullscreen)
                         post_data(:, 1) = post_data(:, 1) - trial_start;
                         dat.trial(trial_count).within_data = post_data;
                         
+                        dat.trial(trial_count).time_preparation = dat.trial(trial_count).time_press - ...
+                                                                  dat.trial(trial_count).time_image_real;
                         % handle catch trial 'correctness'
                         if tgt.image_index(trial_count) ~= -1
                             dat.trial(trial_count).catch_trial = false;
@@ -98,7 +104,16 @@ function dat = TimedResp(id, file_name, fullscreen)
                             
                         state = 'feedback';
                         start_feedback = GetSecs;
-                        stop_feedback = start_feedback + 0.2;
+                        stop_feedback = start_feedback + 0.2;                    
+                        % feedback for correct timing
+                        if abs(time_press - last_beep - trial_start) > 0.1 || isnan(time_press)
+                            % bad
+                            disp('nobeep');
+                            disp((time_press - last_beep - trial_start));
+                        else
+                            % good -- happy ding
+                            aud.Play(2, 0);
+                        end
                     end
                 case 'feedback'
                     % feedback for correct index
@@ -115,14 +130,6 @@ function dat = TimedResp(id, file_name, fullscreen)
                         end
                     end
 
-                    % feedback for correct timing
-                    if abs(time_press - last_beep) > 0.1
-                        % bad
-                    else
-                        % good -- happy ding
-                        aud.Play(2, 0);
-                    end
-
                     if GetSecs >= stop_feedback
                         state = 'posttrial';
                                                 
@@ -131,6 +138,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                         resp_feedback.Reset;
                         frame_count = 1;
                         next_trial = GetSecs + 0.4;
+                        save_time = true;
                     end
                 case 'posttrial'
                     if GetSecs >= next_trial
@@ -154,6 +162,7 @@ function dat = TimedResp(id, file_name, fullscreen)
             
         end % end event loop, cleanup
         
+        WaitSecs(.3);
         sca;
         PsychPortAudio('Close');
         kbrd.Stop;

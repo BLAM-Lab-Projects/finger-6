@@ -32,7 +32,7 @@ function dat = TimedResp(id, file_name, fullscreen)
         state = 'pretrial';
         first_press = nan;
         tmp_image = 0;
-        save_time = false;
+        save_time = true;
 
         window_time = win.Flip();
         block_start = window_time; % use

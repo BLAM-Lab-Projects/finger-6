@@ -39,7 +39,7 @@ function dat = TimedResp(id, file_name, fullscreen)
         dat.block_start = window_time;     
         kbrd.Start;
 
-        % event loop/state machine
+        %% event loop/state machine
         while ~done
             if trial_count > length(tgt.trial)
                 % end of experiment
@@ -131,18 +131,17 @@ function dat = TimedResp(id, file_name, fullscreen)
                     end
 
                     if GetSecs >= stop_feedback
-                        state = 'posttrial';
-                                                
-                        trial_count = trial_count + 1;
-                        first_press = nan;
-                        resp_feedback.Reset;
-                        frame_count = 1;
+                        state = 'posttrial';                                            
                         next_trial = GetSecs + 0.4;
                         save_time = true;
                     end
                 case 'posttrial'
                     if GetSecs >= next_trial
                         state = 'pretrial';
+                        trial_count = trial_count + 1;
+                        first_press = nan;
+                        resp_feedback.Reset;
+                        frame_count = 1;
                     end
             end % end state machine
             resp_feedback.Prime();

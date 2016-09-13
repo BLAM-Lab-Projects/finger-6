@@ -37,7 +37,7 @@ function dat = FreeResp(id, file_name, fullscreen)
 
         window_time = win.Flip();
         block_start = window_time; % use
-        dat.block_start = window_time;       
+        dat.block_start = window_time;
 
         % event loop/state machine
         while ~done
@@ -55,7 +55,7 @@ function dat = FreeResp(id, file_name, fullscreen)
             if ~isnan(releases)
                 resp_feedback.SetFill(find(releases), 'black');
             end
-            
+
             switch state
                 case 'pretrial'
                     [~, ~, dat.trial(trial_count).between_data] = kbrd.CheckMid();
@@ -81,25 +81,25 @@ function dat = FreeResp(id, file_name, fullscreen)
                                         resp_feedback.SetFill(kbrd.valid_indices(logical(presses)), 'red');
 
                                         stop_penalty = GetSecs + 1;
-                                    else 
+                                    else
                                         wrong = true;
                                         state = 'feedback';
                                         feedback_time = GetSecs + 0.2;
 
                                     end
                                 end
-                                
+
                             end
                         case 'doghouse'
-                            
+
                             if GetSecs >= stop_penalty
                                 substate = 'allgood';
                             else
                                 resp_feedback.SetFill(kbrd.valid_indices(logical(presses)), 'red');
                                 wrong_img.Draw(1);
-                            end                 
+                            end
                     end
-                    
+
                 case 'feedback'
                     if wrong
                         c_c_combo = 1;
@@ -111,23 +111,24 @@ function dat = FreeResp(id, file_name, fullscreen)
                             if c_c_combo > 8
                                 c_c_combo = 8;
                             end
+                            aud.Stop(1);
                             aud.Play(c_c_combo + 1, 0);
                         end
                     end
-                    
+
                     if GetSecs >= feedback_time
                         state = 'pretrial';
                     end
-                    
-                    
+
+
             end % end state machine
             resp_feedback.Prime();
-            resp_feedback.Draw();           
+            resp_feedback.Draw();
             window_time = win.Flip(window_time + 0.8 * win.flip_interval);
             frame_count = frame_count + 1;
             pause(1e-7);
         end % end event loop, cleanup
-        
+
         sca;
         PsychPortAudio('Close');
         kbrd.Close;

@@ -57,6 +57,14 @@ for ii = 1:length(img_names)
              'rel_y_scale', nan);
 end
 
+wrong_img = PobImage;
+wrong_img.Add(1, 'original_matrix',...
+    {imcomplement(imread('misc/images/other/wrong.png'))}, ...
+              'rel_x_pos', 0.5, ...
+              'rel_y_pos', 0.5, ...
+              'rel_x_scale', 0.3, ...
+              'rel_y_scale', nan);
+
 %% Set up text
 helptext = ['This experiment is\nTimed Response.\n', ...
             'Here is more text'];
@@ -81,6 +89,8 @@ imgs.Prime();
 % imgs.Draw(index); % to draw
 info_txt.Register(win.pointer);
 resp_feedback.Register(win.pointer);
+wrong_img.Register(win.pointer);
+wrong_img.Prime();
 
 frames(1:350) = struct('push_data', [], ... % complete push data (timestamps, etc...)
                        ...                  % timestamps relative to the experiment starts

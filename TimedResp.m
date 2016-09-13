@@ -47,7 +47,7 @@ function dat = TimedResp(id, file_name, fullscreen)
             [~, presses, ~, releases] = kbrd.Check;
 
             if ~isnan(presses)
-                resp_feedback.SetFill(find(presses), 'green');
+                resp_feedback.SetFill(find(presses), 'gray');
             end
             if ~isnan(releases)
                 resp_feedback.SetFill(find(releases), 'black');

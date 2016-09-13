@@ -30,7 +30,9 @@ function dat = FreeResp(id, file_name, fullscreen)
         trial_count = 1;
         frame_count = 1;
         state = 'pretrial';
+        substate = 'allgood'; % allgood, doghouse (ignore responses)
         first_press = nan;
+        num_tries = 1; % number of guesses attempted
 
         window_time = win.Flip();
         block_start = window_time; % use
@@ -41,6 +43,64 @@ function dat = FreeResp(id, file_name, fullscreen)
             if trial_count > length(tgt.trial)
                 % end of experiment
                 break;
+            end
+
+            % short-term (and unsophisticated) check for keyboard presses
+            [~, presses, ~, releases] = kbrd.Check;
+
+            if ~isnan(presses)
+                resp_feedback.SetFill(find(presses), 'gray');
+            end
+            if ~isnan(releases)
+                resp_feedback.SetFill(find(releases), 'black');
+            end
+            
+            switch state
+                case 'pretrial'
+                    [~, ~, dat.trial(trial_count).between_data] = kbrd.CheckMid();
+                    trial_start = Play(1, window_time + win.flip_interval);
+                    dat.trial(trial_count).trial_start = trial_start - block_start;
+                    imgs.Draw(tgt.image_index(trial_count));
+                    state = 'intrial';
+                case 'intrial'
+                    switch substate
+                        case 'allgood'
+                            if ~isnan(presses)
+                                if tgt.trial(trial_count).index_finger == kbrd.valid_indices(logical(presses))
+                                    resp_feedback.SetFill(kbrd.valid_indices(logical(presses)), 'green');
+                                    wrong = false;
+                                    state = 'feedback';
+                                else
+                                    % only allow a few guesses
+                                    if num_tries < 3
+                                        substate = 'doghouse';
+                                        num_tries = num_tries + 1;
+                                        wrong_img.Draw(1);
+                                        resp_feedback.SetFill(kbrd.valid_indices(logical(presses)), 'red');
+
+                                        stop_penalty = GetSecs + 1;
+                                    else 
+                                        wrong = true;
+                                        state = 'feedback';
+                                    end
+                                end
+                                
+                            end
+                        case 'doghouse'
+                            
+                            if GetSecs >= stop_penalty
+                                substate = 'allgood';
+                            else
+                                resp_feedback.SetFill(kbrd.valid_indices(logical(presses)), 'red');
+                                wrong_img.Draw(1);
+                            end                 
+                    end
+                    
+                case 'feedback'
+                    if wrong
+                    else
+                    end
+                    
             end
         end % end event loop, cleanup
         

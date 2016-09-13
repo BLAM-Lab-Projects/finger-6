@@ -101,7 +101,12 @@ function dat = FreeResp(id, file_name, fullscreen)
                     else
                     end
                     
-            end
+            end % end state machine
+            resp_feedback.Prime();
+            resp_feedback.Draw();           
+            window_time = win.Flip(window_time + 0.8 * win.flip_interval);
+            frame_count = frame_count + 1;
+            pause(1e-7);
         end % end event loop, cleanup
         
         sca;

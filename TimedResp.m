@@ -138,6 +138,7 @@ function dat = TimedResp(id, file_name, fullscreen)
             %Screen('DrawingFinished', win.pointer);
             window_time = win.Flip(window_time + 0.8 * win.flip_interval);
             frame_count = frame_count + 1;
+            pause(1e-7);
             
             dat.trial(trial_count).frames(frame_count).push_data = kbrd.short_term;
             dat.trial(trial_count).frames(frame_count).state = state;

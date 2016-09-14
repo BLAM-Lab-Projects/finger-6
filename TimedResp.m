@@ -108,10 +108,10 @@ function dat = TimedResp(id, file_name, fullscreen)
                         start_feedback = GetSecs;
                         stop_feedback = start_feedback + 0.2;
                         % feedback for correct timing
-                        if abs(time_press - last_beep - trial_start) > 0.1 || isnan(time_press)
+                        if abs(time_press - last_beep - trial_start + .2) > 0.1 || isnan(time_press)
                             % bad
                             disp('nobeep');
-                            disp((time_press - last_beep - trial_start));
+                            disp((time_press - last_beep - trial_start + .2));
                         else
                             % good -- happy ding
                             aud.Play(2, 0);
@@ -164,6 +164,7 @@ function dat = TimedResp(id, file_name, fullscreen)
         end % end event loop, cleanup
 
         WaitSecs(0.3);
+        dat.presses = kbrd.long_term;
         sca;
         PsychPortAudio('Close');
         kbrd.Stop;

@@ -68,8 +68,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                     switch substate
                         case 'allgood'
                             if ~isnan(presses)
-                                disp(tgt.finger_index(trial_count))
-                                disp(find(logical(presses)))
+                                dat.trial(trial_count).guesses(num_tries) = find(presses);
                                 if tgt.finger_index(trial_count) == find(presses)
                                     resp_feedback.SetFill(find(presses), 'green');
                                     tmp_press_index = find(presses);
@@ -89,7 +88,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                                     else
                                         wrong = true;
                                         state = 'feedback';
-                                        feedback_time = GetSecs + 0.3;
+                                        feedback_time = GetSecs + 0.4;
                                         feed = true;
 
                                     end

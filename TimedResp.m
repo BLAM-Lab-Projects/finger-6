@@ -36,11 +36,12 @@ function dat = TimedResp(id, file_name, fullscreen)
 
         window_time = win.Flip();
         block_start = window_time; % use
-        dat.block_start = window_time;     
+        dat.block_start = window_time;
         kbrd.Start;
 
         %% event loop/state machine
         while ~done
+            % check for end of block
             if trial_count > length(tgt.trial)
                 % end of experiment
                 break;
@@ -55,7 +56,7 @@ function dat = TimedResp(id, file_name, fullscreen)
             if ~isnan(releases)
                 resp_feedback.SetFill(find(releases), 'black');
             end
-            
+
             % begin state machine
             switch state
                 case 'pretrial'
@@ -64,13 +65,14 @@ function dat = TimedResp(id, file_name, fullscreen)
                     [~, ~, dat.trial(trial_count).between_data] = kbrd.CheckMid();
                     % schedule audio for next window flip onset
                     trial_start = aud.Play(1, window_time + win.flip_interval);
+                    % start of trial relative to the start of block
                     dat.trial(trial_count).trial_start = trial_start - block_start;
                     state = 'intrial';
                 case 'intrial'
                     % display the image
                     if GetSecs >= dat.trial(trial_count).time_image + trial_start
                         if tgt.image_index(trial_count) ~= -1
-                            tmp_image = 1;
+                            tmp_image = 1; % written to frame-specific data
                             imgs.Draw(tgt.image_index(trial_count));
                             % figure out the actual time of stimulus
                             % presentation
@@ -80,7 +82,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                             end
                         end
                     end
-                    
+
                     % Wrap up trial if almost done
                     if GetSecs >= trial_start + last_beep + 0.2
                         [first_press, time_press, post_data] = kbrd.CheckMid();
@@ -90,7 +92,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                         % of the trial
                         post_data(:, 1) = post_data(:, 1) - trial_start;
                         dat.trial(trial_count).within_data = post_data;
-                        
+
                         dat.trial(trial_count).time_preparation = dat.trial(trial_count).time_press - ...
                                                                   dat.trial(trial_count).time_image_real;
                         % handle catch trial 'correctness'
@@ -101,10 +103,10 @@ function dat = TimedResp(id, file_name, fullscreen)
                             dat.trial(trial_count).catch_trial = true;
                             dat.trial(trial_count).correct = nan;
                         end
-                            
+
                         state = 'feedback';
                         start_feedback = GetSecs;
-                        stop_feedback = start_feedback + 0.2;                    
+                        stop_feedback = start_feedback + 0.2;
                         % feedback for correct timing
                         if abs(time_press - last_beep - trial_start) > 0.1 || isnan(time_press)
                             % bad
@@ -131,7 +133,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                     end
 
                     if GetSecs >= stop_feedback
-                        state = 'posttrial';                                            
+                        state = 'posttrial';
                         next_trial = GetSecs + 0.4;
                         save_time = true;
                     end
@@ -150,7 +152,7 @@ function dat = TimedResp(id, file_name, fullscreen)
             %Screen('DrawingFinished', win.pointer);
             window_time = win.Flip(window_time + 0.8 * win.flip_interval);
             pause(1e-5);
-            
+
             dat.trial(trial_count).frames(frame_count).push_data = kbrd.short_term;
             dat.trial(trial_count).frames(frame_count).state = state;
             dat.trial(trial_count).frames(frame_count).image = tmp_image;
@@ -158,10 +160,10 @@ function dat = TimedResp(id, file_name, fullscreen)
             dat.trial(trial_count).frames(frame_count).time_frame = window_time;
             frame_count = frame_count + 1;
 
-            
+
         end % end event loop, cleanup
-        
-        WaitSecs(.3);
+
+        WaitSecs(0.3);
         sca;
         PsychPortAudio('Close');
         kbrd.Stop;
@@ -170,11 +172,11 @@ function dat = TimedResp(id, file_name, fullscreen)
         imgs.Close;
         win.Close;
 
-% 
+%
 %     catch ERR
 %         % try to clean up resources
 %         sca;
-%         try 
+%         try
 %             kbrd.Close;
 %         catch
 %             disp('No keyboard open');

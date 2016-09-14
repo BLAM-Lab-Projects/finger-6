@@ -118,6 +118,9 @@ function dat = FreeResp(id, file_name, fullscreen)
 
                     if GetSecs >= feedback_time
                         state = 'pretrial';
+                        frame_count = 1;
+                        trial_count = trial_count + 1;
+                        first_press = nan;
                     end
 
 
@@ -126,7 +129,11 @@ function dat = FreeResp(id, file_name, fullscreen)
             resp_feedback.Draw();
             window_time = win.Flip(window_time + 0.8 * win.flip_interval);
             frame_count = frame_count + 1;
-            pause(1e-7);
+            pause(1e-5);
+
+            dat.trial(trial_count).frames(frame_count).push_data = kbrd.short_term;
+            dat.trial(trial_count).frames(frame_count).state = state;
+            dat.trial(trial_count).frames(frame_count).time_frame = window_time;
         end % end event loop, cleanup
 
         sca;

@@ -136,6 +136,7 @@ function dat = FreeResp(id, file_name, fullscreen)
             dat.trial(trial_count).frames(frame_count).time_frame = window_time;
         end % end event loop, cleanup
 
+        WaitSecs(0.3);
         sca;
         PsychPortAudio('Close');
         kbrd.Close;

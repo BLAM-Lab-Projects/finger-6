@@ -23,7 +23,7 @@ aud = PobAudio;
 snd0 = GenClick(1046, 0.45, 3);
 % 0.02 is the size of one beep (fixed!)
 last_beep = (length(snd0) - 0.02 * 44100)/44100;
-snd1 = audioread('misc/sounds/scaled_coin.wav');
+snd1 = audioread('misc/sounds/smw_coin.wav');
 
 aud.Add('slave', 1);
 aud.Add('slave', 2);

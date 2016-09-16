@@ -1,3 +1,0 @@
-IntervalTimer	KEYWORD1
-begin	KEYWORD2
-end	KEYWORD2

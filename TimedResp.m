@@ -4,7 +4,7 @@ function dat = TimedResp(id, file_name, fullscreen)
 % Example:
 %     data = TimedResp('misc/tgt/day1_block1.tgt', false, false);
 %                           tgt file    force transducers  fullscreen
-%     try
+    try
         %% Setup
 
         SetupTr;
@@ -85,7 +85,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                     if GetSecs >= trial_start + last_beep + 0.3
                         [first_press, time_press, post_data] = kbrd.CheckMid();
                         dat.trial(trial_count).index_press = first_press;
-                        dat.trial(trial_count).time_press = time_press - trial_start;
+                        dat.trial(trial_count).time_press = time_press - trial_start + .2;
                         % force transducer times are relative to the start
                         % of the trial
                         post_data(:, 1) = post_data(:, 1) - trial_start;
@@ -204,20 +204,21 @@ function dat = TimedResp(id, file_name, fullscreen)
         imgs.Close;
         win.Close;
 
-%
-%     catch ERR
-%         % try to clean up resources
-%         sca;
-%         try
-%             kbrd.Close;
-%         catch
-%             disp('No keyboard open');
-%         end
-%         try
-%             PsychPortAudio('Close');
-%         catch
-%             disp('No audio device open.');
-%         end
-%         rethrow(ERR);
-%     end
+
+    catch ERR
+        % try to clean up resources
+        ShowCursor;
+        sca;
+        try
+            kbrd.Close;
+        catch
+            disp('No keyboard open');
+        end
+        try
+            PsychPortAudio('Close');
+        catch
+            disp('No audio device open.');
+        end
+        rethrow(ERR);
+    end
 end

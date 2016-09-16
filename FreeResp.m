@@ -4,7 +4,7 @@ function dat = FreeResp(id, file_name, fullscreen)
 % Example:
 %     data = FreeResp('misc/tgt/day1_block1.tgt', false, false);
 %                           tgt file    force transducers  fullscreen
-%     try
+    try
         %% Setup
 
         SetupRt;
@@ -161,15 +161,16 @@ function dat = FreeResp(id, file_name, fullscreen)
         win.Close;
 
 
-%     catch ERR
-%         % try to clean up resources
-%         sca;
-%         try
-%             PsychPortAudio('Close');
-%         catch
-%             disp('No audio device open.');
-%         end
-%         KbQueueRelease;
-%         rethrow(ERR);
-%     end
+    catch ERR
+        % try to clean up resources
+        ShowCursor;
+        sca;
+        try
+            PsychPortAudio('Close');
+        catch
+            disp('No audio device open.');
+        end
+        KbQueueRelease;
+        rethrow(ERR);
+    end
 end

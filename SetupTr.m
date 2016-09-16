@@ -7,6 +7,7 @@ tgt = ParseTgt(file_name, ',');
 tgt = struct2table(tgt); % R2013b ++!
 
 %% Set up screen
+HideCursor;
 Screen('Preference', 'Verbosity', 1);
 if fullscreen
     win_size = [];

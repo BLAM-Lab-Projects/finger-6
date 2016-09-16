@@ -49,9 +49,6 @@ function dat = TimedResp(id, file_name, fullscreen)
             if ~isnan(presses)
                 feedback.Set(1, 'frame_color', [150 150 150]); % gray
             end
-            if ~isnan(releases)
-                feedback.Set(1, 'frame_color', [255 255 255]); % white
-            end
 
             % begin state machine
             switch state

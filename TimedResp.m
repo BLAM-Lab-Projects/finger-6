@@ -9,7 +9,7 @@ function dat = TimedResp(id, file_name, fullscreen)
 
         SetupTr;
 
-        feedback.Draw();
+        feedback.Draw(1);
 
         info_txt.Draw();
         win.Flip();
@@ -20,7 +20,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                         num2str(4 - ii), ' seconds'];
             info_txt.Set('value', helptext);
             info_txt.Draw();
-            feedback.Draw();
+            feedback.Draw(1);
             win.Flip;
             WaitSecs(1);
         end
@@ -145,7 +145,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                     end
             end % end state machine
             feedback.Prime();
-            feedback.Draw();
+            feedback.Draw(1);
             % optimize drawing?
             %Screen('DrawingFinished', win.pointer);
             window_time = win.Flip(window_time + 0.8 * win.flip_interval);

@@ -48,6 +48,8 @@ function dat = TimedResp(id, file_name, fullscreen)
 
             if ~isnan(presses)
                 feedback.Set(1, 'frame_color', [150 150 150]); % gray
+            else
+                feedback.Set(1, 'frame_color', [255 255 255]);
             end
 
             % begin state machine
@@ -103,8 +105,6 @@ function dat = TimedResp(id, file_name, fullscreen)
                         % feedback for correct timing
                         if abs(time_press - last_beep - trial_start + .2) > 0.1 || isnan(time_press)
                             % bad
-                            disp('nobeep');
-                            disp((time_press - last_beep - trial_start + .2));
                         else
                             % good -- happy ding
                             aud.Play(2, 0);
@@ -134,7 +134,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                         state = 'pretrial';
                         trial_count = trial_count + 1;
                         first_press = nan;
-                        feedback.Set(1, 'frame_color', [190 190 190]); % gray
+                        feedback.Set(1, 'frame_color', [255 255 255]); % white
                         frame_count = 1;
                     end
             end % end state machine

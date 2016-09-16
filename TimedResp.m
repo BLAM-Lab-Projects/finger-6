@@ -9,8 +9,7 @@ function dat = TimedResp(id, file_name, fullscreen)
 
         SetupTr;
 
-        resp_feedback.Prime();
-        resp_feedback.Draw();
+        feedback.Draw();
 
         info_txt.Draw();
         win.Flip();
@@ -21,7 +20,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                         num2str(4 - ii), ' seconds'];
             info_txt.Set('value', helptext);
             info_txt.Draw();
-            resp_feedback.Draw();
+            feedback.Draw();
             win.Flip;
             WaitSecs(1);
         end
@@ -51,10 +50,10 @@ function dat = TimedResp(id, file_name, fullscreen)
             [~, presses, ~, releases] = kbrd.Check;
 
             if ~isnan(presses)
-                resp_feedback.SetFill(find(presses), 'gray');
+                feedback.Set('frame_color', [190 190 190]); % gray
             end
             if ~isnan(releases)
-                resp_feedback.SetFill(find(releases), 'black');
+                feedback.Set('frame_color', [255 255 255]); % white
             end
 
             % begin state machine
@@ -84,7 +83,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                     end
 
                     % Wrap up trial if almost done
-                    if GetSecs >= trial_start + last_beep + 0.2
+                    if GetSecs >= trial_start + last_beep + 0.3
                         [first_press, time_press, post_data] = kbrd.CheckMid();
                         dat.trial(trial_count).index_press = first_press;
                         dat.trial(trial_count).time_press = time_press - trial_start;
@@ -106,7 +105,7 @@ function dat = TimedResp(id, file_name, fullscreen)
 
                         state = 'feedback';
                         start_feedback = GetSecs;
-                        stop_feedback = start_feedback + 0.2;
+                        stop_feedback = start_feedback + 0.3;
                         % feedback for correct timing
                         if abs(time_press - last_beep - trial_start + .2) > 0.1 || isnan(time_press)
                             % bad
@@ -123,12 +122,11 @@ function dat = TimedResp(id, file_name, fullscreen)
                     if tgt.image_index ~= -1
                         if dat.trial(trial_count).correct || ...
                                 isnan(dat.trial(trial_count).correct) % nonexistant
-                            resp_feedback.SetFill(first_press, 'green');
+                                feedback.Set('frame_color', [97, 255, 77]); % green
                         else
                             if ~isnan(first_press)
-                                resp_feedback.SetFill(first_press, 'red');
+                                feedback.Set('frame_color', [255, 30, 63]); %red
                             end
-                            resp_feedback.SetFrame(tgt.finger_index(trial_count), 'green');
                         end
                     end
 
@@ -142,12 +140,12 @@ function dat = TimedResp(id, file_name, fullscreen)
                         state = 'pretrial';
                         trial_count = trial_count + 1;
                         first_press = nan;
-                        resp_feedback.Reset;
+                        feedback.Set('frame_color', [190 190 190]); % gray
                         frame_count = 1;
                     end
             end % end state machine
-            resp_feedback.Prime();
-            resp_feedback.Draw();
+            feedback.Prime();
+            feedback.Draw();
             % optimize drawing?
             %Screen('DrawingFinished', win.pointer);
             window_time = win.Flip(window_time + 0.8 * win.flip_interval);
@@ -163,7 +161,7 @@ function dat = TimedResp(id, file_name, fullscreen)
 
         end % end event loop, cleanup
 
-        WaitSecs(0.3);
+        WaitSecs(0.5);
         dat.presses = kbrd.long_term;
         sca;
         PsychPortAudio('Close');

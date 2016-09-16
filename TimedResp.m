@@ -9,8 +9,6 @@ function dat = TimedResp(id, file_name, fullscreen)
 
         SetupTr;
 
-        feedback.Draw(1);
-
         info_txt.Draw();
         win.Flip();
         WaitSecs(2);
@@ -20,7 +18,6 @@ function dat = TimedResp(id, file_name, fullscreen)
                         num2str(4 - ii), ' seconds'];
             info_txt.Set('value', helptext);
             info_txt.Draw();
-            feedback.Draw(1);
             win.Flip;
             WaitSecs(1);
         end
@@ -50,10 +47,10 @@ function dat = TimedResp(id, file_name, fullscreen)
             [~, presses, ~, releases] = kbrd.Check;
 
             if ~isnan(presses)
-                feedback.Set('frame_color', [190 190 190]); % gray
+                feedback.Set(1, 'frame_color', [190 190 190]); % gray
             end
             if ~isnan(releases)
-                feedback.Set('frame_color', [255 255 255]); % white
+                feedback.Set(1, 'frame_color', [255 255 255]); % white
             end
 
             % begin state machine
@@ -122,10 +119,10 @@ function dat = TimedResp(id, file_name, fullscreen)
                     if tgt.image_index ~= -1
                         if dat.trial(trial_count).correct || ...
                                 isnan(dat.trial(trial_count).correct) % nonexistant
-                                feedback.Set('frame_color', [97, 255, 77]); % green
+                                feedback.Set(1, 'frame_color', [97, 255, 77]); % green
                         else
                             if ~isnan(first_press)
-                                feedback.Set('frame_color', [255, 30, 63]); %red
+                                feedback.Set(1, 'frame_color', [255, 30, 63]); %red
                             end
                         end
                     end
@@ -140,7 +137,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                         state = 'pretrial';
                         trial_count = trial_count + 1;
                         first_press = nan;
-                        feedback.Set('frame_color', [190 190 190]); % gray
+                        feedback.Set(1, 'frame_color', [190 190 190]); % gray
                         frame_count = 1;
                     end
             end % end state machine

@@ -11,8 +11,8 @@ feedback.Add(1, 'rel_x_pos', 0.5, ...
 feedback.Register(win.pointer);
 feedback.Prime();
 
-feedback.Set('frame_color', [255, 30, 63]); %red
-feedback.Set('frame_color', [97, 255, 77]); % green
-feedback.Set('frame_color', [190 190 190]); % gray
+feedback.Set(1, 'frame_color', [255, 30, 63]); %red
+feedback.Set(1, 'frame_color', [97, 255, 77]); % green
+feedback.Set(1, 'frame_color', [190 190 190]); % gray
 
 feedback.Draw(1);

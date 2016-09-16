@@ -9,7 +9,6 @@ function dat = FreeResp(id, file_name, fullscreen)
 
         SetupRt;
 
-        feedback.Draw(1);
 
         info_txt.Draw();
         win.Flip();
@@ -20,7 +19,6 @@ function dat = FreeResp(id, file_name, fullscreen)
                         num2str(4 - ii), ' seconds'];
             info_txt.Set('value', helptext);
             info_txt.Draw();
-            feedback.Draw(1);
             win.Flip;
             WaitSecs(1);
         end
@@ -49,10 +47,10 @@ function dat = FreeResp(id, file_name, fullscreen)
             [~, presses, ~, releases] = kbrd.Check;
 
             if ~isnan(presses)
-                feedback.Set('frame_color', [190 190 190]); % gray
+                feedback.Set(1, 'frame_color', [190 190 190]); % gray
             end
             if ~isnan(releases)
-                feedback.Set('frame_color', [255 255 255]); % white
+                feedback.Set(1, 'frame_color', [255 255 255]); % white
             end
 
             switch state
@@ -69,7 +67,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                             if ~isnan(presses)
                                 dat.trial(trial_count).guesses(num_tries) = find(presses);
                                 if tgt.finger_index(trial_count) == find(presses)
-                                    feedback.Set('frame_color', [97, 255, 77]); % green
+                                    feedback.Set(1, 'frame_color', [97, 255, 77]); % green
                                     tmp_press_index = find(presses);
                                     wrong = false;
                                     state = 'feedback';
@@ -80,7 +78,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                                     if num_tries < 3
                                         substate = 'doghouse';
                                         num_tries = num_tries + 1;
-                                        feedback.Set('frame_color', [255, 30, 63]); %red
+                                        feedback.Set(1, 'frame_color', [255, 30, 63]); %red
                                         tmp_press_index = find(presses);
                                         stop_penalty = GetSecs + 1;
                                     else
@@ -98,7 +96,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                             if GetSecs >= stop_penalty
                                 substate = 'allgood';
                             else
-                                feedback.Set('frame_color', [255, 30, 63]); %red
+                                feedback.Set(1, 'frame_color', [255, 30, 63]); %red
                             end
                     end
 
@@ -129,9 +127,9 @@ function dat = FreeResp(id, file_name, fullscreen)
                         num_tries = 1;
                     end
                     if wrong
-                        feedback.Set('frame_color', [85, 98, 255]); % blue
+                        feedback.Set(1, 'frame_color', [85, 98, 255]); % blue
                     else
-                        feedback.Set('frame_color', [97, 255, 77]); % green
+                        feedback.Set(1, 'frame_color', [97, 255, 77]); % green
                     end
 
                     if GetSecs >= feedback_time

@@ -86,8 +86,6 @@ imgs.Prime();
 info_txt.Register(win.pointer);
 feedback.Register(win.pointer);
 feedback.Prime();
-wrong_img.Register(win.pointer);
-wrong_img.Prime();
 
 frames(1:350) = struct('push_data', [], ... % complete push data (timestamps, etc...)
                        ...                  % timestamps relative to the experiment starts

@@ -9,8 +9,7 @@ function dat = FreeResp(id, file_name, fullscreen)
 
         SetupRt;
 
-        resp_feedback.Prime();
-        resp_feedback.Draw();
+        feedback.Draw();
 
         info_txt.Draw();
         win.Flip();
@@ -21,7 +20,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                         num2str(4 - ii), ' seconds'];
             info_txt.Set('value', helptext);
             info_txt.Draw();
-            resp_feedback.Draw();
+            feedback.Draw();
             win.Flip;
             WaitSecs(1);
         end
@@ -50,10 +49,10 @@ function dat = FreeResp(id, file_name, fullscreen)
             [~, presses, ~, releases] = kbrd.Check;
 
             if ~isnan(presses)
-                resp_feedback.SetFill(find(presses), 'gray');
+                feedback.Set('frame_color', [190 190 190]); % gray
             end
             if ~isnan(releases)
-                resp_feedback.SetFill(find(releases), 'black');
+                feedback.Set('frame_color', [255 255 255]); % white
             end
 
             switch state
@@ -70,7 +69,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                             if ~isnan(presses)
                                 dat.trial(trial_count).guesses(num_tries) = find(presses);
                                 if tgt.finger_index(trial_count) == find(presses)
-                                    resp_feedback.SetFill(find(presses), 'green');
+                                    feedback.Set('frame_color', [97, 255, 77]); % green
                                     tmp_press_index = find(presses);
                                     wrong = false;
                                     state = 'feedback';
@@ -81,8 +80,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                                     if num_tries < 3
                                         substate = 'doghouse';
                                         num_tries = num_tries + 1;
-                                        wrong_img.Draw(1:2);
-                                        resp_feedback.SetFill(find(presses), 'red');
+                                        feedback.Set('frame_color', [255, 30, 63]); %red
                                         tmp_press_index = find(presses);
                                         stop_penalty = GetSecs + 1;
                                     else
@@ -100,8 +98,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                             if GetSecs >= stop_penalty
                                 substate = 'allgood';
                             else
-                                resp_feedback.SetFill(kbrd.valid_indices(tmp_press_index), 'red');
-                                wrong_img.Draw(1:2);
+                                feedback.Set('frame_color', [255, 30, 63]); %red
                             end
                     end
 
@@ -132,9 +129,9 @@ function dat = FreeResp(id, file_name, fullscreen)
                         num_tries = 1;
                     end
                     if wrong
-                        resp_feedback.SetFill(tgt.finger_index(trial_count), 'blue');
+                        feedback.Set('frame_color', [85, 98, 255]); % blue
                     else
-                        resp_feedback.SetFill(tmp_press_index, 'green');
+                        feedback.Set('frame_color', [97, 255, 77]); % green
                     end
 
                     if GetSecs >= feedback_time
@@ -144,8 +141,8 @@ function dat = FreeResp(id, file_name, fullscreen)
                         trial_count = trial_count + 1;
                     end
             end % end state machine
-            resp_feedback.Prime();
-            resp_feedback.Draw();
+            feedback.Prime();
+            feedback.Draw();
             window_time = win.Flip(window_time + 0.8 * win.flip_interval);
             frame_count = frame_count + 1;
             pause(1e-5);

@@ -57,7 +57,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                 case 'pretrial'
                     % Dump non-relevant data elsewhere (but still
                     % accessible)
-                    [~, ~, dat.trial(trial_count).between_data] = kbrd.CheckMid();
+                    startdev = true;
                     % schedule audio for next window flip onset
                     trial_start = aud.Play(1, window_time + win.flip_interval);
                     % start of trial relative to the start of block
@@ -143,6 +143,10 @@ function dat = TimedResp(id, file_name, fullscreen)
             % optimize drawing?
             %Screen('DrawingFinished', win.pointer);
             window_time = win.Flip(window_time + 0.8 * win.flip_interval);
+            if startdev
+                [~, ~, dat.trial(trial_count).between_data] = kbrd.CheckMid();
+                startdev = false;
+            end
             pause(1e-5);
 
             dat.trial(trial_count).frames(frame_count).push_data = kbrd.short_term;

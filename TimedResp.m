@@ -47,7 +47,7 @@ function dat = TimedResp(id, file_name, fullscreen)
             [~, presses, ~, releases] = kbrd.Check;
 
             if ~isnan(presses)
-                feedback.Set(1, 'frame_color', [190 190 190]); % gray
+                feedback.Set(1, 'frame_color', [150 150 150]); % gray
             end
             if ~isnan(releases)
                 feedback.Set(1, 'frame_color', [255 255 255]); % white

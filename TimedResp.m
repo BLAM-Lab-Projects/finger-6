@@ -29,6 +29,9 @@ function dat = TimedResp(id, file_name, fullscreen)
         first_press = nan;
         tmp_image = 0;
         save_time = true;
+        goodjob = 0;
+        draw_feedback_txt = false;
+        aud_feedback = true;
 
         window_time = win.Flip();
         block_start = window_time; % use
@@ -105,14 +108,23 @@ function dat = TimedResp(id, file_name, fullscreen)
                         % feedback for correct timing
                         if abs(time_press - last_beep - trial_start + .2) > 0.1 || isnan(time_press)
                             % bad
-                        else
-                            % good -- happy ding
-                            aud.Play(2, 0);
+                            if (time_press - last_beep - trial_start + .2) > 0.1 || isnan(time_press)% too late
+                                feedback_txt.Set('value', 'Too late.');
+                            else % too early
+                                feedback_txt.Set('value', 'Too early.');
+                            end
+                            feedback_txt.Draw();
+                            draw_feedback_txt = true;
+                            goodjob = false;
                         end
                     end
                 case 'feedback'
                     % feedback for correct index
                     aud.Stop(1);
+                    if draw_feedback_txt
+                        feedback_txt.Draw();
+                    end
+
                     if tgt.image_index ~= -1
                         if dat.trial(trial_count).correct || ...
                                 isnan(dat.trial(trial_count).correct) % nonexistant
@@ -120,14 +132,35 @@ function dat = TimedResp(id, file_name, fullscreen)
                         else
                             if ~isnan(first_press)
                                 feedback.Set(1, 'frame_color', [255, 30, 63]); %red
+                                goodjob = false;
                             end
                         end
+                    else % catch trial feedback
+                        if isnan(first_press)
+                            feedback.Set(1, 'frame_color', [255, 30, 63]); %red
+                            goodjob = false;
+                        else
+                            feedback.Set(1, 'frame_color', [97, 255, 77]); % green
+                        end
+                    end
+                    
+                    if aud_feedback && goodjob
+                        aud_feedback = false;
+                        aud.Play(2, 0);
                     end
 
                     if GetSecs >= stop_feedback
-                        state = 'posttrial';
-                        next_trial = GetSecs + 0.4;
-                        save_time = true;
+                        if isnan(first_press)
+                            if ~isnan(presses)% at least made one press
+                                state = 'posttrial';
+                                next_trial = GetSecs + 0.4;
+                                save_time = true;
+                            end
+                        else
+                            state = 'posttrial';
+                            next_trial = GetSecs + 0.4;
+                            save_time = true;
+                        end
                     end
                 case 'posttrial'
                     if GetSecs >= next_trial
@@ -136,13 +169,15 @@ function dat = TimedResp(id, file_name, fullscreen)
                         first_press = nan;
                         feedback.Set(1, 'frame_color', [255 255 255]); % white
                         frame_count = 1;
+                        goodjob = true;
+                        draw_feedback_txt = false;
+                        aud_feedback = true;
                     end
             end % end state machine
             feedback.Prime();
             feedback.Draw(1);
             % optimize drawing?
-            %Screen('DrawingFinished', win.pointer);
-            window_time = win.Flip(window_time + 0.8 * win.flip_interval);
+            Screen('DrawingFinished', win.pointer);
             if startdev
                 [~, ~, dat.trial(trial_count).between_data] = kbrd.CheckMid();
                 startdev = false;
@@ -155,7 +190,7 @@ function dat = TimedResp(id, file_name, fullscreen)
             tmp_image = 0;
             dat.trial(trial_count).frames(frame_count).time_frame = window_time;
             frame_count = frame_count + 1;
-
+            window_time = win.Flip(window_time + 0.8 * win.flip_interval);
 
         end % end event loop, cleanup
 

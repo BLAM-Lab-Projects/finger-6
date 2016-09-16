@@ -70,7 +70,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                                     tmp_press_index = find(presses);
                                     wrong = false;
                                     state = 'feedback';
-                                    feedback_time = GetSecs + 0.2;
+                                    feedback_time = GetSecs + 0.4;
                                     feed = true;
                                 else
                                     % only allow a few guesses

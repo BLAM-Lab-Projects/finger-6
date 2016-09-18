@@ -4,7 +4,7 @@ function WriteScanTgt(out_path,subjname,sess,block,image_type)
 %    WriteScanTgt(path, subjname, session, block, image_type);
 % 
 %   copy-paste test:
-	% WriteScanTgt('~/Documents/BLAM/finger-5/misc/tfiles/','AAA',1,1,0);
+	% WriteScanTgt('c:/Users/fmri/Desktop/finger-6/misc/tfiles/','AAA',1,1,0);
 %
     
     

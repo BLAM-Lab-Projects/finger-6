@@ -1,5 +1,5 @@
 % make all target files for AVMA imaging experiment
-subjname = 'AAA';
+subjname = 'CAA';
 tgt_path = ['../../data/',subjname,'/'];
 
 if(~exist(tgt_path))
@@ -23,16 +23,17 @@ WriteRtTgt(tgt_path, 'day', 1, 'block', 1, 'swapped', 0,...
                'image_type', 0, 'repeats', 10, 'ind_finger', [1:5 1:5], 'ind_img',1:10);
 
 % initial training on both symbol sets
-for symbSet = 1:2
-    for blk = 1:numTrainingBlocks
-        WriteRtTgt(tgt_path, 'day', 1, 'block', blk, 'swapped', 0,...
-               'image_type', symbSet, 'repeats', 20);
-    end
+symbSet = 1;
+for blk = 1:numTrainingBlocks
+    WriteRtTgt(tgt_path, 'day', 1, 'block', blk, 'swapped', 0,...
+        'image_type', symbSet, 'repeats', 20, 'ind_finger', [1:5 1:5], 'ind_img',1:10);
 end
 
+
 %% Day 1 - scan session
-
-
+for run = 1:8
+    WriteScanTgt(tgt_path,1,run,0);
+end
 
 %% Day 1 - post-scan TR
 for blk = 1:numTRblocks

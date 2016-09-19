@@ -77,7 +77,7 @@ info_txt = PobText('value', helptext, 'size', 50, ...
                    'style', 'bold');
 
 %% Set up responses & feedback
-kbrd = BlamForceboard(6:10);
+kbrd = BlamForceboard(1:5);
 
 %% Register relative to window
 imgs.Register(win.pointer);

@@ -1,10 +1,10 @@
-function dat = MRI(id, file_name, fullscreen, attentions)
+function [dat, tr_struct]  = MRI(id, file_name, fullscreen)
 
     try
         %% Setup
         SetupMRI;
         
-        info_text.Draw();
+        info_txt.Draw();
         win.Flip();
         WaitSecs(2);
         
@@ -14,16 +14,17 @@ function dat = MRI(id, file_name, fullscreen, attentions)
         frame_count = 1;
         state = 'pretrial'; % pretrial, prep, gonogo
         tr_count = 0;
-        tr_time0 = nan; % get time of first TR
+        tr.Start();
         
         % wait for the first tr
         while tr_count < 1
             [key_times, key_vals] = tr.Check;
-            if any(ismember(key_vals, {'t', '5'}))
+            if ~isnan(key_vals) && any(ismember(key_vals, {'t', '5'}))
                 tr_count = tr_count + 1;
                 tr_struct.count(tr_count) = tr_count;
                 tr_struct.times(tr_count) = key_times(ismember(key_vals, {'t', '5'}));
             end
+            WaitSecs(.1); % rate limit for no good reason
         end
         
         window_time = win.Flip();
@@ -38,7 +39,7 @@ function dat = MRI(id, file_name, fullscreen, attentions)
             
             [~, presses, ~, releases] = kbrd.Check; % use for experimenter feedback
             [key_times, key_vals] = tr.Check;
-            if any(ismember(key_vals, {'t', '5'}))
+            if ~isnan(key_times) && any(ismember(key_vals, {'t', '5'}))
                 tr_count = tr_count + 1;
                 tr_struct.count(tr_count) = tr_count;
                 tr_struct.times(tr_count) = key_times(ismember(key_vals, {'t', '5'}));
@@ -57,12 +58,14 @@ function dat = MRI(id, file_name, fullscreen, attentions)
                         dat.trial(trial_count).time_image_real = window_time + win.flip_interval;
                         save_time_go = true;
                         state = 'gonogo';
+                        go_time = GetSecs + 2;
+                        end_time = go_time + 2;
                     end
                     
                 case 'gonogo'
                     imgs.Draw(tgt.image_index(trial_count));
                     % go?
-                    if GetSecs >= tgt.go_delay(trial_count)
+                    if GetSecs >= go_time
                         feedback.Set(1, 'frame_color', [97, 255, 77]);
                         if save_time_go
                             save_time_go = false;
@@ -70,14 +73,18 @@ function dat = MRI(id, file_name, fullscreen, attentions)
                         end
                     end
                     
-                    if GetSecs >= tgt.go_delay(trial_count) + 1
+                    if GetSecs >= end_time
                         feedback.Set(1, 'frame_color', [255 255 255]);
-                        state = 'post';
+                        state = 'pretrial';
+                        trial_count = trial_count + 1;
                     end
-                case 'post'
-                    
-                    
             end % end state machine
+            
+            feedback.Prime();
+            feedback.Draw(1);
+            
+            pause(1e-7);
+            window_time = win.Flip(window_time + 0.8 * win.flip_interval);
             
         end % end infinite loop
             

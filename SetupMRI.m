@@ -1,6 +1,7 @@
 % Offset the boilerplate stuff to make the main loop easier/shorter to read
 
 %% Add paths
+Screen('Preference', 'SkipSyncTests', 1); 
 addpath(genpath('Psychoobox'));
 addpath(genpath('ptbutils'));
 tgt = ParseTgt(file_name, ',');
@@ -49,14 +50,9 @@ info_txt = PobText('value', helptext, 'size', 30, ...
                    'rel_y_pos', 0.5);
 
 %% Set up responses & feedback
-if attention
-    % only use one response, to check if subject is paying attention
-    error('Fix vigilance task.');
-    kbrd = BlamForceboard(4);
-else
-    % use entire right hand
-    kbrd = BlamForceboard(6:10);
-end
+
+% use entire right hand
+kbrd = BlamForceboard(1:5);
 
 feedback = PobRectangle();
 

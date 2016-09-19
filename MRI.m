@@ -34,6 +34,12 @@ function dat = MRI(id, file_name, fullscreen, attentions)
                 case 'prep'
                     
                 case 'gonogo'
+                    % no go
+                    if isnan(tgt.go_delay(trial_count))
+                        
+                    else % go
+                        
+                    end
                     
             end
             

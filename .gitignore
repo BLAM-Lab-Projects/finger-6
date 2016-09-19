@@ -3,3 +3,4 @@ octave-workspace
 *.asv
 *.m~
 *_key.mat
+samples/

@@ -51,6 +51,7 @@ info_txt = PobText('value', helptext, 'size', 30, ...
 %% Set up responses & feedback
 if attention
     % only use one response, to check if subject is paying attention
+    error('Fix vigilance task.');
     kbrd = BlamForceboard(4);
 else
     % use entire right hand
@@ -74,4 +75,10 @@ feedback.Prime();
 
 info_txt.Register(win.pointer);
 
+%% TR obj (plus other keys)
+tr = BlamTr();
+
 %% Data storage
+
+tr_struct = struct('times', zeros(1, max(tgt.trnum)), 'count', zeros(1, max(tgt.trnum)));
+

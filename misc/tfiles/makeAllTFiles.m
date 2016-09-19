@@ -20,7 +20,7 @@ numTRblocks = 6;
 
 % initial familiarization with task using hand stimuli
 WriteRtTgt(tgt_path, 'day', 1, 'block', 1, 'swapped', 0,...
-               'image_type', 0, 'repeats', 20);
+               'image_type', 0, 'repeats', 10, 'ind_finger', [1:5 1:5], 'ind_img',1:10);
 
 % initial training on both symbol sets
 for symbSet = 1:2
@@ -54,7 +54,7 @@ end
 for day = 2:4
     for blk = 1:numTrainingBlocks
         for symbSet = 1:2
-            WriteRtTgt(tgt_path, 'day', 5, 'block', blk, 'swapped', 0,...
+            WriteRtTgt(tgt_path, 'day', 5, 'block', blk, 'swapped', [1 3],...
             'image_type', 1, 'repeats', 20);
         end
     end

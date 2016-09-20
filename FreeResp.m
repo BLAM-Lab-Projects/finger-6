@@ -53,11 +53,11 @@ function dat = FreeResp(id, file_name, fullscreen)
 
             switch state
                 case 'pretrial'
+                    trial_count = trial_count + 1;
                     [~, ~, dat.trial(trial_count).between_data] = kbrd.CheckMid();
                     trial_start = aud.Play(1, window_time + win.flip_interval);
                     dat.trial(trial_count).trial_start = trial_start - block_start;
                     imgs.Draw(tgt.image_index(trial_count));
-                    trial_count = trial_count + 1;
                     state = 'intrial';
                 case 'intrial'
                     imgs.Draw(tgt.image_index(trial_count));

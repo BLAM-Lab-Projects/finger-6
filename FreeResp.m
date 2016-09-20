@@ -9,7 +9,6 @@ function dat = FreeResp(id, file_name, fullscreen)
 
         SetupRt;
 
-
         info_txt.Draw();
         win.Flip();
         WaitSecs(2);
@@ -24,7 +23,7 @@ function dat = FreeResp(id, file_name, fullscreen)
         end
         % need to prime resp_feedback after each change??
         done = false;
-        trial_count = 1;
+        trial_count = 0;
         frame_count = 1;
         state = 'pretrial';
         substate = 'allgood'; % allgood, doghouse (ignore responses)
@@ -58,6 +57,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                     trial_start = aud.Play(1, window_time + win.flip_interval);
                     dat.trial(trial_count).trial_start = trial_start - block_start;
                     imgs.Draw(tgt.image_index(trial_count));
+                    trial_count = trial_count + 1;
                     state = 'intrial';
                 case 'intrial'
                     imgs.Draw(tgt.image_index(trial_count));
@@ -65,7 +65,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                         case 'allgood'
                             if ~isnan(presses)
                                 dat.trial(trial_count).guesses(num_tries) = find(presses);
-                                if tgt.finger_index(trial_count) == find(presses)
+                                if tgt.intended_finger(trial_count) == find(presses)
                                     feedback.Set(1, 'frame_color', [97, 255, 77]); % green
                                     tmp_press_index = find(presses);
                                     wrong = false;
@@ -103,7 +103,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                     if feed
                         [first_press, time_press, post_data] = kbrd.CheckMid();
                         dat.trial(trial_count).within_data = post_data;
-                        dat.trial(trial_count).time_press = time_press - trial_start;
+                        dat.trial(trial_count).time_press = time_press;
                         dat.trial(trial_count).index_press = first_press;
                         if wrong
                             c_c_combo = 1;
@@ -136,7 +136,6 @@ function dat = FreeResp(id, file_name, fullscreen)
                         state = 'pretrial';
                         substate = 'allgood';
                         frame_count = 1;
-                        trial_count = trial_count + 1;
                     end
             end % end state machine
             feedback.Prime();

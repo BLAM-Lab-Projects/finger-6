@@ -98,8 +98,8 @@ trial(1:length(tgt.trial)) = struct('trial_start', [], ... % trial time relative
                       'time_press', [], ... % time of press relative to time_start
                       'index_image', [], ... % image index
                       'index_press', [], ...  % which finger pressed
-                      'index_finger', [], ...
-                      'correct', [], ... % index_press == index_finger
+                      'intended_finger', [], ...
+                      'correct', [], ... % index_press == intended_finger
                       'frames', frames, ...
                       'between_data', [], ... % data dump for between trials
                       'within_data', [], ... % data dump for within the trial
@@ -108,7 +108,7 @@ trial(1:length(tgt.trial)) = struct('trial_start', [], ... % trial time relative
 % fill in trial-specific information
 for ii = 1:length(tgt.trial)
     trial(ii).index_image = tgt.image_index(ii);
-    trial(ii).index_finger = tgt.finger_index(ii);
+    trial(ii).intended_finger = tgt.finger_index(ii);
     if (tgt.image_index(ii) == tgt.swap_index_1(ii)) || (tgt.image_index(ii) == tgt.swap_index_2(ii))
         trial(ii).sub_swap = true;
     else

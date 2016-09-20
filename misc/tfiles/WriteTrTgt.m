@@ -35,19 +35,20 @@ function WriteTrTgt(out_path, varargin)
         error('Swapping goes by index, not the actual value.');
     end
 
-    if any(diff(ind_img) < 0) || any(diff(ind_img) < 0)
-        error('Make sure to define indices in increasing order.')
-    end
+    %if any(diff(ind_img) < 0) || any(diff(ind_img) < 0)
+    %    error('Make sure to define indices in increasing order.')
+    %end
 
     seed = day * block;
     rand('seed', seed);
 
-    combos = allcomb(1, ind_finger);
+    combos = allcomb(1, ind_img);
     combos(:, 3) = -1;
-    for ii = 1:length(ind_finger)
-        indices = combos(:,2) == ind_finger(ii);
-        combos(indices, 3) = ind_img(ii);
+    for ii = 1:length(ind_img)
+        indices = find(combos(:,2) == ind_img(ii));
+        combos(indices, 3) = ind_finger(ii);
     end
+    combos(:,[2 3]) = combos(:,[3 2]);
 	combos = repmat(combos, repeats, 1);
     limit = 10000;
     maxnum = 3;
@@ -70,7 +71,10 @@ function WriteTrTgt(out_path, varargin)
     if easy_block
         combos(:, 1) = min(times);
     end
-
+    
+    combos(:,[4 5]) = 0;
+    swapped2 = 0;
+    %{
     if any(swapped > 0) % if not zero
         combos(:, 4) = swapped(1);
         combos(:, 5) = swapped(2);
@@ -80,6 +84,7 @@ function WriteTrTgt(out_path, varargin)
         combos(:, 4:5) = 0;
         swapped2 = 0;
     end
+    %}
     % combos is (times, finger, image, swap1, swap2)
 
     % add random prep times
@@ -93,6 +98,7 @@ function WriteTrTgt(out_path, varargin)
         catchind(end) = combo_size;
     end
     % time, finger, img_time, indices of two swapped images
+
     catch_trial = [nan nan nan combos(1, 4:5)];
     combos = insertrows(combos, catch_trial, catchind);
     combo_size = size(combos, 1);

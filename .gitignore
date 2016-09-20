@@ -2,5 +2,8 @@
 octave-workspace
 *.asv
 *.m~
+*.DS_Store
 *_key.mat
 samples/
+*.m~HEAD
+

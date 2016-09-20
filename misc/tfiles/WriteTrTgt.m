@@ -5,12 +5,12 @@ function WriteTrTgt(out_path, varargin)
     % WriteTrTgt('~/Documents/BLAM/finger-5/misc/tfiles/', ...
     %            'day', 2, 'block', 4, 'swapped', [1 3],...
     %            'image_type', 1, 'repeats', 5, 'easy_block', 0,...
-    %            'ind_finger', 7:10, 'ind_img', 1:4, 'times', 0.4:0.05:0.95)
+    %            'ind_finger', 7:10, 'ind_img', 1:4, 'mintime', .1, 'maxtime')
 
     opts = struct('day', 1, 'block', 1, 'swapped', 0, ...
                   'image_type', 0, 'repeats', 3, ...
                   'easy_block', 0, 'ind_finger', 1:5, ...
-                  'ind_img', 1:5, 'times', 0.4:0.05:0.95);
+                  'ind_img', 1:5, 'mintime', .5, 'maxtime', .95);
     opts = CheckInputs(opts, varargin{:});
 
     day = opts.day;
@@ -21,7 +21,9 @@ function WriteTrTgt(out_path, varargin)
     easy_block = opts.easy_block;
     ind_finger = opts.ind_finger;
     ind_img = opts.ind_img;
-    times = opts.times;
+    mintime = opts.mintime;
+    maxtime = opts.maxtime;
+
 
     if length(ind_finger) ~= length(ind_img)
         error('Cannot handle weird mappings, make sure ind_finger and ind_img are the same length.');
@@ -38,7 +40,7 @@ function WriteTrTgt(out_path, varargin)
     seed = day * block;
     rand('seed', seed);
 
-    combos = allcomb(times, ind_finger);
+    combos = allcomb(1, ind_finger);
     combos(:, 3) = -1;
     for ii = 1:length(ind_finger)
         indices = find(combos(:,2) == ind_finger(ii));
@@ -78,6 +80,9 @@ function WriteTrTgt(out_path, varargin)
     end
     % combos is (times, finger, image, swap1, swap2)
 
+    % add random prep times
+    combos(:,1) = mintime+rand(size(combos(:,1)))*(maxtime-mintime);
+    
     % add catch trials
     num_catch = floor(combo_size/10);
     randind = randi([-2 2], 1, num_catch);
@@ -97,6 +102,7 @@ function WriteTrTgt(out_path, varargin)
                     repmat(swapped2, combo_size, 1) ...
                     repmat(image_type, combo_size, 1) combos];
 
+                
     filename = ['tr_','dy',num2str(day), '_bk', num2str(block),...
                 '_sw', num2str(swapped2), '_sh', num2str(image_type), '.tgt'];
     headers = {'day', 'block', 'trial', 'easy', ...

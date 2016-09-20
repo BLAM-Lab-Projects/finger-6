@@ -1,4 +1,4 @@
-function WriteScanTgt(out_path,subjname,sess,block,image_type)
+function WriteScanTgt(out_path,sess,block,image_type)
 % Make target files AVMA scanner task
 %
 %    WriteScanTgt(path, subjname, session, block, image_type);
@@ -19,24 +19,24 @@ function WriteScanTgt(out_path,subjname,sess,block,image_type)
 % 8. Stimulus Delay (delay between start of TR and presentation of stimulus)
 % 9. Go-Cue Delay (delay between stimulus presentation and Go-Cue
 
-TRlength = 2; % length of TR in seconds
-min_go_delay = 2; % minimum go-cue delay
-max_go_delay = 4; % maximum go-cue delay
+TRlength = 1.1; % length of TR in seconds
+min_go_delay = 3; % minimum go-cue delay
+max_go_delay = 3; % maximum go-cue delay
 
 % load symbol key if it already exists for this subject
-if(~exist([subjname,'_key.mat']))
+if(~exist([path,'key.mat']))
     symbkey = randperm(5); % symbol/key mapping press symbkey(i) for symbol i
-    eval(['save ',subjname,'_key']);
+    eval(['save ', path,'key symbkey']);
 else
-    eval(['load ',subjname,'_key']);
+    eval(['load ',path,'key']);
 end
 
 Nreps = 24;
 Nsymb = 5;
 Ntrials = Nreps*Nsymb;
 
-subblock = zeros(Nreps,9);
-
+subblock = zeros(Nreps,10);
+subblock(:,10) = 1; % active trials
 % build target file with all reps
 tFile = [];
 for i=1:Nsymb
@@ -45,6 +45,9 @@ for i=1:Nsymb
     tFile = [tFile; subblock];
 end
 
+% add rest trials
+tFile = [tFile; zeros(Nrest,10)];
+
 % scramble trial order
 tFile = tFile(randperm(Ntrials),:);
 
@@ -52,21 +55,15 @@ tFile = tFile(randperm(Ntrials),:);
 tFile(:,1) = sess;
 tFile(:,2) = block;
 tFile(:,3) = 1:Ntrials; % trial number
-tFile(:,4) = 4+(0:Ntrials-1)*5; % TR number
+tFile(:,4) = 4+(0:Ntrials-1)*8; % TR number
 tFile(:,5) = image_type;
 tFile(:,8) = TRlength*rand(Ntrials,1); % randomly jitter stimulus presentation time relative to TR start time
-go_delays = exprnd(1,Ntrials,1);
-go_diff = max_go_delay-min_go_delay;
-while(sum(go_delays>go_diff)>0)
-    go_delays(go_delays>go_diff) = exprnd(.5,sum(go_delays>go_diff),1);
-end
-tFile(:,9) = min_go_delay + go_delays; % exponential distribution ~ mean(1s)
-
+tFile(:,9) = go_delay; % exponential distribution ~ mean(1s)
 
 filename = ['scan_','sess',num2str(sess), '_bk', num2str(block),...
                 '_sh', num2str(image_type), '.tgt'];
     headers = {'sess','block','trial', 'trnum', 'image_type', 'image_index', 'finger_index',  ...
-               'stim_delay', 'go_delay'};
+               'stim_delay', 'go_delay', 'trial_type'};
 
 	fid = fopen([out_path, filename], 'wt');
 	csvFun = @(str)sprintf('%s, ', str);

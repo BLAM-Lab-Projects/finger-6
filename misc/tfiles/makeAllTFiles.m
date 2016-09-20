@@ -1,6 +1,6 @@
 % make all target files for AVMA imaging experiment
-subjname = 'CAA';
-tgt_path = ['../../data/',subjname,'/'];
+subjname = 'AAA';
+tgt_path = ['./',subjname,'/'];
 
 if(~exist(tgt_path))
     mkdir(tgt_path);

@@ -106,13 +106,15 @@ function dat = TimedResp(id, file_name, fullscreen)
                         state = 'feedback';
                         start_feedback = GetSecs;
                         stop_feedback = start_feedback + 0.3;
+
                         % feedback for correct timing
-                        if abs(time_press - last_beep + trial_start) > 0.1 || isnan(time_press)
+                        if abs(last_beep - (time_press - trial_start)) > 0.1 || isnan(time_press)
                             % bad
-                            if (time_press - last_beep + trial_start) > 0.1 || isnan(time_press)% too late
-                                feedback_txt.Set('value', 'Too late.');
-                            else % too early
+                            disp(last_beep - (time_press - trial_start))
+                            if last_beep - (time_press - trial_start) > 0.1 || isnan(time_press)% too late
                                 feedback_txt.Set('value', 'Too early.');
+                            else % too early
+                                feedback_txt.Set('value', 'Too late.');
                             end
                             feedback_txt.Draw();
                             draw_feedback_txt = true;
@@ -122,6 +124,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                 case 'feedback'
                     % feedback for correct index
                     aud.Stop(1);
+                    imgs.Draw(tgt.image_index(trial_count));
                     if draw_feedback_txt
                         feedback_txt.Draw();
                     end

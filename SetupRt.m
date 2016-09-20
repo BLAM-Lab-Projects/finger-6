@@ -104,7 +104,7 @@ trial(1:length(tgt.trial)) = struct('trial_start', [], ... % trial time relative
                       'between_data', [], ... % data dump for between trials
                       'within_data', [], ... % data dump for within the trial
                       'sub_swap', [],...
-                      'guesses', nan(1,3));
+                      'guesses', nan(1,4));
 % fill in trial-specific information
 for ii = 1:length(tgt.trial)
     trial(ii).index_image = tgt.image_index(ii);

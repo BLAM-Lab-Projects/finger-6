@@ -74,7 +74,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                                     feed = true;
                                 else
                                     % only allow a few guesses
-                                    if num_tries < 3
+                                    if num_tries < 4
                                         substate = 'doghouse';
                                         num_tries = num_tries + 1;
                                         feedback.Set(1, 'frame_color', [255, 30, 63]); %red

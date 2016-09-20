@@ -30,19 +30,20 @@ function WriteRtTgt(out_path, varargin)
         error('Swapping goes by index, not the actual value.');
     end
 
-    if any(diff(ind_img) < 0) || any(diff(ind_img) < 0)
-        error('Make sure to define indices in increasing order.')
-    end
+    %if any(diff(ind_img) < 0) || any(diff(ind_img) < 0)
+    %    error('Make sure to define indices in increasing order.')
+    %end
 
     seed = day * block;
     rand('seed', seed);
 
-    combos = allcomb(times, ind_finger);
+    combos = allcomb(times, ind_img);
     combos(:, 3) = -1;
-    for ii = 1:length(ind_finger)
-        indices = find(combos(:,2) == ind_finger(ii));
-        combos(indices, 3) = ind_img(ii);
+    for ii = 1:length(ind_img)
+        indices = find(combos(:,2) == ind_img(ii));
+        combos(indices, 3) = ind_finger(ii);
     end
+    combos(:,[2:3]) = combos(:,[3 2]);
 	combos = repmat(combos, repeats, 1);
     limit = 10000;
     maxnum = 3;
@@ -61,7 +62,9 @@ function WriteRtTgt(out_path, varargin)
 
     combos = combos2;
     combo_size = size(combos, 1);
-
+    combos(:,4:5) = 0;
+    swapped2 = 0;
+    %{
     if any(swapped > 0) % if not zero
         combos(:, 4) = swapped(1);
         combos(:, 5) = swapped(2);
@@ -71,6 +74,7 @@ function WriteRtTgt(out_path, varargin)
         combos(:, 4:5) = 0;
         swapped2 = 0;
     end
+    %}
     % combos is (times, finger, image, swap1, swap2)
     combos(:, 1) = [];
     combo_size = size(combos, 1);

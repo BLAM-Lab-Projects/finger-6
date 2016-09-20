@@ -1,3 +1,4 @@
+Screen('Preference', 'SkipSyncTests', 1);
 addpath(genpath('Psychoobox'));
 addpath(genpath('ptbutils'));
 tgt = ParseTgt(file_name, ',');
@@ -39,7 +40,7 @@ aud.Stop(1);
 imgs = PobImage;
 if tgt.image_type(1)
     img_dir = 'misc/images/shapes/';
-    img_names = dir('misc/images/shapes/*.png');
+    img_names = dir('misc/images/shapes/*.jpg');
 else
     img_dir = 'misc/images/hands/';
     img_names = dir('misc/images/hands/*.jpg');
@@ -77,7 +78,7 @@ info_txt = PobText('value', helptext, 'size', 50, ...
                    'style', 'bold');
 
 %% Set up responses & feedback
-kbrd = BlamForceboard(6:10);
+kbrd = BlamForceboard(1:5);
 
 %% Register relative to window
 imgs.Register(win.pointer);

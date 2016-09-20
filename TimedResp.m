@@ -144,7 +144,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                         end
                     end
                     
-                    if aud_feedback && goodjob
+                    if goodjob && aud_feedback
                         aud_feedback = false;
                         aud.Play(2, 0);
                     end

@@ -1,6 +1,7 @@
 % Offset the boilerplate stuff to make the main loop easier/shorter to read
 
 %% Add paths
+Screen('Preference', 'SkipSyncTests', 1); 
 addpath(genpath('Psychoobox'));
 addpath(genpath('ptbutils'));
 tgt = ParseTgt(file_name, ',');
@@ -40,8 +41,8 @@ for ii = 1:length(img_names)
 end
 
 %% Set up text
-helptext = ['This experiment is\nTimed Response.\n', ...
-            'Here is more text'];
+helptext = ['This experiment is \nthe MRI one.\n', ...
+            'Waiting for the initial TR?'];
 
 info_txt = PobText('value', helptext, 'size', 30, ...
                    'color', [255 255 255], ...
@@ -49,11 +50,31 @@ info_txt = PobText('value', helptext, 'size', 30, ...
                    'rel_y_pos', 0.5);
 
 %% Set up responses & feedback
-kbrd = BlamForceboard(6:10);
+
+% use entire right hand
+kbrd = BlamForceboard(1:5);
+
+feedback = PobRectangle();
+
+feedback.Add(1, 'rel_x_pos', 0.5, ...
+             'rel_y_pos', 0.5, ...
+             'rel_x_scale', 0.3, ...
+             'rel_y_scale', nan, ...
+             'fill_color', [255 255 255], ...
+             'fill_alpha', 0, ...
+             'frame_color', [255 255 255]);
 %% Register relative to window
 imgs.Register(win.pointer);
+feedback.Register(win.pointer);
 imgs.Prime();
-% imgs.Draw(index); % to draw
+feedback.Prime();
+
 info_txt.Register(win.pointer);
 
+%% TR obj (plus other keys)
+tr = BlamTr();
+
 %% Data storage
+
+tr_struct = struct('times', zeros(1, max(tgt.trnum)), 'count', zeros(1, max(tgt.trnum)));
+

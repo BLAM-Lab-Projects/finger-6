@@ -6,4 +6,5 @@ octave-workspace
 *_key.mat
 samples/
 *.m~HEAD
+misc/tfiles/*.tgt
 

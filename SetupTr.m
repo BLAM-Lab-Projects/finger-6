@@ -111,19 +111,19 @@ trial(1:length(tgt.trial)) = struct('trial_start', [], ... % trial time relative
                       'time_preparation', [], ... % time_press - time_image
                       'index_image', [], ... % image index
                       'index_press', [], ...  % which finger pressed
-                      'index_finger', [], ...
+                      'intended_finger', [], ...
                       'correct', [], ... % index_press == index_finger
-                      'frames', frames, ...
+                      'frames', frames, ... % data for individual frames
                       'between_data', [], ... % data dump for between trials
                       'within_data', [], ... % data dump for within the trial
-                      'sub_swap', [], ...
-                      'catch_trial', []);
+                      'sub_swap', [], ... % whether this trial contained swapped indices (t/f)
+                      'catch_trial', []); % boolean (t/f)
 % fill in trial-specific information
 for ii = 1:length(tgt.trial)
     trial(ii).index_image = tgt.image_index(ii);
-    trial(ii).index_finger = tgt.finger_index(ii);
-    trial(ii).prop_image = tgt.image_time(ii);
-    trial(ii).time_image = tgt.image_time(ii)*last_beep; % relative to trial start
+    trial(ii).intended_finger_finger = tgt.intended_finger(ii);
+    trial(ii).time_prep = tgt.image_time(ii);
+    trial(ii).time_image = last_beep - tgt.image_time(ii); % relative to end beep train
     if (tgt.image_index(ii) == tgt.swap_index_1(ii)) || (tgt.image_index(ii) == tgt.swap_index_2(ii))
         trial(ii).sub_swap = true;
     else

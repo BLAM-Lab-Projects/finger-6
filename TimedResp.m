@@ -11,7 +11,7 @@ function dat = TimedResp(id, file_name, fullscreen)
 
         info_txt.Draw();
         win.Flip();
-        WaitSecs(2);
+        WaitSecs(1);
 
         for ii = 1:3
             helptext = ['Experiment starting in\n', ...
@@ -23,12 +23,12 @@ function dat = TimedResp(id, file_name, fullscreen)
         end
         % need to prime resp_feedback after each change??
         done = false;
-        trial_count = 1;
+        trial_count = 0;
         frame_count = 1;
         state = 'pretrial';
         first_press = nan;
         tmp_image = 0;
-        save_time = true;
+        save_image_time = true;
         goodjob = 0;
         draw_feedback_txt = false;
         aud_feedback = true;
@@ -60,23 +60,24 @@ function dat = TimedResp(id, file_name, fullscreen)
                 case 'pretrial'
                     % Dump non-relevant data elsewhere (but still
                     % accessible)
+                    trial_count = trial_count + 1;
                     startdev = true;
                     % schedule audio for next window flip onset
                     trial_start = aud.Play(1, window_time + win.flip_interval);
-                    % start of trial relative to the start of block
-                    dat.trial(trial_count).trial_start = trial_start - block_start;
+                    % absolute start of the trial
+                    dat.trial(trial_count).trial_start = trial_start;
                     state = 'intrial';
                 case 'intrial'
                     % display the image
                     if GetSecs >= dat.trial(trial_count).time_image + trial_start
-                        if tgt.image_index(trial_count) ~= -1
+                        if ~isnan(tgt.image_index(trial_count))
                             tmp_image = 1; % written to frame-specific data
                             imgs.Draw(tgt.image_index(trial_count));
                             % figure out the actual time of stimulus
                             % presentation
-                            if save_time
-                                save_time = false;
-                                dat.trial(trial_count).time_image_real = window_time + win.flip_interval - trial_start;
+                            if save_image_time
+                                save_image_time = false;
+                                dat.trial(trial_count).time_image_real = window_time + win.flip_interval;
                             end
                         end
                     end
@@ -85,18 +86,18 @@ function dat = TimedResp(id, file_name, fullscreen)
                     if GetSecs >= trial_start + last_beep + 0.3
                         [first_press, time_press, post_data] = kbrd.CheckMid();
                         dat.trial(trial_count).index_press = first_press;
-                        dat.trial(trial_count).time_press = time_press - trial_start + .2;
+                        dat.trial(trial_count).time_press = time_press;
                         % force transducer times are relative to the start
                         % of the trial
-                        post_data(:, 1) = post_data(:, 1) - trial_start;
+                        post_data(:, 1) = post_data(:, 1);
                         dat.trial(trial_count).within_data = post_data;
 
                         dat.trial(trial_count).time_preparation = dat.trial(trial_count).time_press - ...
                                                                   dat.trial(trial_count).time_image_real;
                         % handle catch trial 'correctness'
-                        if tgt.image_index(trial_count) ~= -1
+                        if ~isnan(tgt.image_index(trial_count))
                             dat.trial(trial_count).catch_trial = false;
-                            dat.trial(trial_count).correct = first_press == tgt.finger_index(trial_count);
+                            dat.trial(trial_count).correct = first_press == tgt.intended_finger(trial_count);
                         else
                             dat.trial(trial_count).catch_trial = true;
                             dat.trial(trial_count).correct = nan;
@@ -106,9 +107,9 @@ function dat = TimedResp(id, file_name, fullscreen)
                         start_feedback = GetSecs;
                         stop_feedback = start_feedback + 0.3;
                         % feedback for correct timing
-                        if abs(time_press - last_beep - trial_start + .2) > 0.1 || isnan(time_press)
+                        if abs(time_press - last_beep + trial_start) > 0.1 || isnan(time_press)
                             % bad
-                            if (time_press - last_beep - trial_start + .2) > 0.1 || isnan(time_press)% too late
+                            if (time_press - last_beep + trial_start) > 0.1 || isnan(time_press)% too late
                                 feedback_txt.Set('value', 'Too late.');
                             else % too early
                                 feedback_txt.Set('value', 'Too early.');
@@ -125,7 +126,7 @@ function dat = TimedResp(id, file_name, fullscreen)
                         feedback_txt.Draw();
                     end
 
-                    if tgt.image_index ~= -1
+                    if ~isnan(tgt.image_index)
                         if dat.trial(trial_count).correct || ...
                                 isnan(dat.trial(trial_count).correct) % nonexistant
                                 feedback.Set(1, 'frame_color', [97, 255, 77]); % green
@@ -154,18 +155,17 @@ function dat = TimedResp(id, file_name, fullscreen)
                             if ~isnan(presses)% at least made one press
                                 state = 'posttrial';
                                 next_trial = GetSecs + 0.4;
-                                save_time = true;
+                                save_image_time = true;
                             end
                         else
                             state = 'posttrial';
                             next_trial = GetSecs + 0.4;
-                            save_time = true;
+                            save_image_time = true;
                         end
                     end
                 case 'posttrial'
                     if GetSecs >= next_trial
                         state = 'pretrial';
-                        trial_count = trial_count + 1;
                         first_press = nan;
                         feedback.Set(1, 'frame_color', [255 255 255]); % white
                         frame_count = 1;

@@ -1,16 +1,18 @@
 function WriteTrTgt(out_path, varargin)
     % copy-paste test:
-	% WriteTrTgt('~/Documents/BLAM/finger-5/misc/tfiles/');
+	% WriteTrTgt('c:/Users/fmri/Desktop/finger-6/misc/tmp/');
     % More thorough example:
     % WriteTrTgt('~/Documents/BLAM/finger-5/misc/tfiles/', ...
     %            'day', 2, 'block', 4, 'swapped', [1 3],...
     %            'image_type', 1, 'repeats', 5, 'easy_block', 0,...
-    %            'ind_finger', 7:10, 'ind_img', 1:4, 'mintime', .1, 'maxtime')
-
+    %            'ind_finger', 1:5, 'ind_img', 1:5, 'mintime', 0.05,
+    %            'maxtime', 0.5);
+    %
+    % last beep is at 1.4s (including 500ms pause)
     opts = struct('day', 1, 'block', 1, 'swapped', 0, ...
                   'image_type', 0, 'repeats', 3, ...
                   'easy_block', 0, 'ind_finger', 1:5, ...
-                  'ind_img', 1:5, 'mintime', .5, 'maxtime', .95);
+                  'ind_img', 1:5, 'mintime', 0.05, 'maxtime', 0.5);
     opts = CheckInputs(opts, varargin{:});
 
     day = opts.day;
@@ -43,7 +45,7 @@ function WriteTrTgt(out_path, varargin)
     combos = allcomb(1, ind_finger);
     combos(:, 3) = -1;
     for ii = 1:length(ind_finger)
-        indices = find(combos(:,2) == ind_finger(ii));
+        indices = combos(:,2) == ind_finger(ii);
         combos(indices, 3) = ind_img(ii);
     end
 	combos = repmat(combos, repeats, 1);
@@ -55,7 +57,7 @@ function WriteTrTgt(out_path, varargin)
         i = [find(combos2(1:end - 1, 1) ~= combos2(2:end, 1)); length(combos2)];
         l = diff([0; i]);
 
-        if any(l > maxnum) % no more than two allowed
+        if any(l > maxnum) % no more than three allowed
             count = count + 1;
         else
             break;
@@ -91,7 +93,7 @@ function WriteTrTgt(out_path, varargin)
         catchind(end) = combo_size;
     end
     % time, finger, img_time, indices of two swapped images
-    catch_trial = [0 -1 -1 combos(1, 4:5)];
+    catch_trial = [nan nan nan combos(1, 4:5)];
     combos = insertrows(combos, catch_trial, catchind);
     combo_size = size(combos, 1);
 
@@ -106,7 +108,7 @@ function WriteTrTgt(out_path, varargin)
     filename = ['tr_','dy',num2str(day), '_bk', num2str(block),...
                 '_sw', num2str(swapped2), '_sh', num2str(image_type), '.tgt'];
     headers = {'day', 'block', 'trial', 'easy', ...
-               'swapped', 'image_type','image_time', 'finger_index',  ...
+               'swapped', 'image_type','image_time', 'intended_finger',  ...
                'image_index', 'swap_index_1', 'swap_index_2'};
 
 	fid = fopen([out_path, filename], 'wt');
@@ -116,6 +118,6 @@ function WriteTrTgt(out_path, varargin)
 	xchar = strcat(xchar(1:end-1), '\n');
 	fprintf(fid, xchar);
 	fclose(fid);
-    dlmwrite([out_path, filename], final_output, '-append','precision',4);
+    dlmwrite([out_path, filename], final_output, '-append','precision', 4);
 
 end

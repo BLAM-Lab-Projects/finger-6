@@ -18,48 +18,41 @@ function WriteScanTgt(out_path,sess,block,symbkey)
 % 7. Finger Number (1 to 5)
 % 8. Stimulus Delay (delay between start of TR and presentation of stimulus)
 % 9. Go-Cue Delay (delay between stimulus presentation and Go-Cue
+% 10. Trial Type (0 = NoGo, 1 = Go)
 
 TRlength = 1.1; % length of TR in seconds
-go_delay = 3; % minimum go-cue delay
-go_delay = 3; % maximum go-cue delay
+TRs_per_trial = 7;
 
-% load symbol key if it already exists for this subject
-%{
-if(~exist([out_path,'key.mat']))
-    symbkey = randperm(5); % symbol/key mapping press symbkey(i) for symbol i
-    eval(['save ', out_path,'key symbkey']);
-else
-    eval(['load ', out_path,'symbkey']);
-end
-%}
-%symbkey = [1:5 1:5];
+go_delay = 2.5; % minimum go-cue delay
 
-Nreps = 3;
+Nreps = 2;
 Nsymb = 10;
 Nrest = 3;
 Ntrials = Nreps*Nsymb+Nrest;
 
-subblock = zeros(Nreps,10);
-subblock(:,10) = 1; % active trials
 % build target file with all reps
-tFile = [];
-for i=1:Nsymb
-    subblock(:,6) = i;
-    subblock(:,7) = symbkey(i);
-    tFile = [tFile; subblock];
-end
 
+fing_index = [1:5 1:5];
+combos = allcomb([0 1],symbkey);
 % add rest trials
+combos(:,3) = fing_index(combos(:,2));
+combos = repmat(combos,Nreps,1);
+
+tFile = zeros(size(combos,1),10);
+tFile(:,6:7) = combos(:,[3 2]);
+tFile(:,10) = combos(:,1);
+
 tFile = [tFile; zeros(Nrest,10)];
 
 % scramble trial order
+Ntrials = size(tFile,1);
 tFile = tFile(randperm(Ntrials),:);
 
 % include trial num etc
 tFile(:,1) = sess;
 tFile(:,2) = block;
 tFile(:,3) = 1:Ntrials; % trial number
-tFile(:,4) = 4+(0:Ntrials-1)*8; % TR number
+tFile(:,4) = 4+(0:Ntrials-1)*TRs_per_trial; % TR number
 tFile(:,5) = 1;
 tFile(:,8) = 0;%TRlength*rand(Ntrials,1); % randomly jitter stimulus presentation time relative to TR start time
 tFile(:,9) = go_delay; % exponential distribution ~ mean(1s)
@@ -77,5 +70,3 @@ filename = ['scan_','sess',num2str(sess), '_bk', num2str(block), '.tgt'];
 	fclose(fid);
     dlmwrite([out_path, filename], tFile, '-append','precision',4);
     
-    figure(1); clf;
-    hist(tFile(:,9));

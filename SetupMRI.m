@@ -42,7 +42,7 @@ end
 
 %% Set up text
 helptext = ['This experiment is \nthe MRI one.\n', ...
-            'Waiting for the initial TR?'];
+            'Waiting for the initial TR.'];
 
 info_txt = PobText('value', helptext, 'size', 30, ...
                    'color', [255 255 255], ...
@@ -72,7 +72,11 @@ feedback.Prime();
 info_txt.Register(win.pointer);
 
 %% TR obj (plus other keys)
-tr = BlamTr();
+if ~simulate
+    tr = BlamTr();
+else
+    
+end
 
 %% Data storage
 

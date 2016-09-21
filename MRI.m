@@ -1,4 +1,4 @@
-function [dat, tr_struct]  = MRI(id, file_name, fullscreen)
+function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
 
 %     try
         %% Setup
@@ -14,10 +14,16 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen)
         frame_count = 1;
         state = 'pretrial'; % pretrial, prep, gonogo
         tr_count = 0;
-        tr.Start();
+        if simulate
+            baseline = GetSecs;
+        else
+            tr.Start();
+        end
         
         % wait for the first tr
         while tr_count < 1
+            if simulate
+            else
             [key_times, key_vals] = tr.Check;
             if ~isnan(key_vals) && any(ismember(key_vals, {'t', '5'}))
                 tr_count = tr_count + 1;
@@ -25,6 +31,7 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen)
                 tr_struct.times(tr_count) = key_times(ismember(key_vals, {'t', '5'}));
             end
             WaitSecs(.1); % rate limit for no good reason
+            end
         end
         
         window_time = win.Flip();

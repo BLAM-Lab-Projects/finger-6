@@ -34,6 +34,7 @@ function dat = FreeResp(id, file_name, fullscreen)
         block_start = window_time; % use
         dat.block_start = window_time;
         kbrd.Start;
+        Priority(win.priority);
 
         % event loop/state machine
         while ~done

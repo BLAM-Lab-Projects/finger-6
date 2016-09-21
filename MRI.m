@@ -9,11 +9,13 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
         WaitSecs(2);
         
         % Send char to scanner, wait for first TR
+        tr_length = 1; % in seconds
         done = false;
         trial_count = 1;
         frame_count = 1;
         state = 'pretrial'; % pretrial, prep, gonogo
         tr_count = 0;
+        
         if simulate
             baseline = GetSecs;
         else
@@ -21,8 +23,12 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
         end
         
         % wait for the first tr
-        while tr_count < 1
+        while tr_count < tr_length
             if simulate
+                if GetSecs - baseline > tr_length
+                    tr_count = tr_count + 1;
+                    baseline = GetSecs;
+                end
             else
             [key_times, key_vals] = tr.Check;
             if ~isnan(key_vals) && any(ismember(key_vals, {'t', '5'}))
@@ -39,18 +45,28 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
         dat.block_start = block_start;
         kbrd.Start;
         
+        Priority(win.priority);
         while ~done
             if trial_count > length(tgt.trial)
                 break;
             end
             
             [~, presses, ~, releases] = kbrd.Check; % use for experimenter feedback
-            [key_times, key_vals] = tr.Check;
-            if ~isnan(key_times) && any(ismember(key_vals, {'t', '5'}))
-                tr_count = tr_count + 1;
-                tr_struct.count(tr_count) = tr_count;
-                tr_struct.times(tr_count) = key_times(ismember(key_vals, {'t', '5'}));
-            end      
+            if simulate
+                if GetSecs - baseline > 1
+                    tr_count = tr_count + 1;
+                    baseline = GetSecs;
+                    tr_struct.count(tr_count) = tr_count;
+                    tr_struct.times(tr_count) = baseline;
+                end
+            else
+                [key_times, key_vals] = tr.Check;
+                if ~isnan(key_times) && any(ismember(key_vals, {'t', '5'}))
+                    tr_count = tr_count + 1;
+                    tr_struct.count(tr_count) = tr_count;
+                    tr_struct.times(tr_count) = key_times(ismember(key_vals, {'t', '5'}));
+                end     
+            end
             switch state
                 case 'pretrial'
                     % check if it's time to start the trial
@@ -85,6 +101,10 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
                         state = 'pretrial';
                         trial_count = trial_count + 1;
                     end
+                case 'feedback'
+                    % change image color based on correctness
+                    
+                   
             end % end state machine
             
             feedback.Prime();

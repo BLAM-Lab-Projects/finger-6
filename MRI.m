@@ -45,6 +45,7 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
         dat.block_start = block_start;
         kbrd.Start;
         
+        Priority(win.priority);
         while ~done
             if trial_count > length(tgt.trial)
                 break;

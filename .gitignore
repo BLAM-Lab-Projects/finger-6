@@ -7,4 +7,4 @@ octave-workspace
 samples/
 *.m~HEAD
 misc/tfiles/*.tgt
-
+misc/tfiles/*/*.tgt

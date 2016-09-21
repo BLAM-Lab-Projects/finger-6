@@ -1,6 +1,6 @@
 function [dat, tr_struct]  = MRI(id, file_name, fullscreen)
 
-    try
+%     try
         %% Setup
         SetupMRI;
         
@@ -90,14 +90,14 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen)
             
         
         
-    catch ERR
-        ShowCursor;
-        sca;
-        try
-            kbrd.Close();
-        catch
-            disp('No keyboard open.');
-        end
-        rethrow(ERR);
-    end
+%     catch ERR
+%         ShowCursor;
+%         sca;
+%         try
+%             kbrd.Close();
+%         catch
+%             disp('No keyboard open.');
+%         end
+%         rethrow(ERR);
+%     end
 end

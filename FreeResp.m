@@ -37,11 +37,6 @@ function dat = FreeResp(id, file_name, fullscreen)
 
         % event loop/state machine
         while ~done
-            if trial_count > length(tgt.trial)
-                % end of experiment
-                break;
-            end
-
             % short-term (and unsophisticated) check for keyboard presses
             [~, presses, ~, releases] = kbrd.Check;
 
@@ -54,6 +49,11 @@ function dat = FreeResp(id, file_name, fullscreen)
             switch state
                 case 'pretrial'
                     trial_count = trial_count + 1;
+                    if trial_count > length(tgt.trial)
+                        % end of experiment
+                        break;
+                    end
+
                     [~, ~, dat.trial(trial_count).between_data] = kbrd.CheckMid();
                     trial_start = aud.Play(1, window_time + win.flip_interval);
                     dat.trial(trial_count).trial_start = trial_start - block_start;
@@ -64,29 +64,29 @@ function dat = FreeResp(id, file_name, fullscreen)
                     switch substate
                         case 'allgood'
                             if ~isnan(presses)
-                                dat.trial(trial_count).guesses(num_tries) = find(presses);
-                                if tgt.intended_finger(trial_count) == find(presses)
+                                dat.trial(trial_count).guesses(end + 1) = find(presses);
+                                if tgt.finger_index(trial_count) == find(presses)
                                     feedback.Set(1, 'frame_color', [97, 255, 77]); % green
                                     tmp_press_index = find(presses);
                                     wrong = false;
                                     state = 'feedback';
-                                    feedback_time = GetSecs + 0.4;
+                                    feedback_time = GetSecs + 0.5;
                                     feed = true;
                                 else
                                     % only allow a few guesses
-                                    if num_tries < 4
+                                   % if num_tries < 4
                                         substate = 'doghouse';
                                         num_tries = num_tries + 1;
                                         feedback.Set(1, 'frame_color', [255, 30, 63]); %red
                                         tmp_press_index = find(presses);
                                         stop_penalty = GetSecs + 1;
-                                    else
-                                        wrong = true;
-                                        state = 'feedback';
-                                        feedback_time = GetSecs + 0.4;
-                                        feed = true;
+%                                     else
+%                                         wrong = true;
+%                                         state = 'feedback';
+%                                         feedback_time = GetSecs + 0.5;
+%                                         feed = true;
 
-                                    end
+                                  %  end
                                 end
 
                             end
@@ -100,6 +100,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                     end
 
                 case 'feedback'
+                    imgs.Draw(tgt.image_index(trial_count));
                     if feed
                         [first_press, time_press, post_data] = kbrd.CheckMid();
                         dat.trial(trial_count).within_data = post_data;
@@ -132,11 +133,17 @@ function dat = FreeResp(id, file_name, fullscreen)
                     end
 
                     if GetSecs >= feedback_time
+                        extinguish_time = GetSecs + .1;
                         feedback.Set(1, 'frame_color', [255 255 255]); % white
+                        state = 'extinguish';
+                    end
+                case 'extinguish'
+                    if GetSecs >= extinguish_time
                         state = 'pretrial';
                         substate = 'allgood';
                         frame_count = 1;
                     end
+                    
             end % end state machine
             feedback.Prime();
             feedback.Draw(1);

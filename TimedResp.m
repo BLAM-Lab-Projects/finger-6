@@ -108,10 +108,10 @@ function dat = TimedResp(id, file_name, fullscreen)
                         stop_feedback = start_feedback + 0.3;
 
                         % feedback for correct timing
-                        if abs(last_beep - (time_press - trial_start)) > 0.1 || isnan(time_press)
+                        if abs(last_beep - (time_press - trial_start) + .2) > 0.1 || isnan(time_press)
                             % bad
                             disp(last_beep - (time_press - trial_start))
-                            if last_beep - (time_press - trial_start) > 0.1 || isnan(time_press)% too late
+                            if last_beep - (time_press - trial_start)  + .2> 0.1 || isnan(time_press)% too late
                                 feedback_txt.Set('value', 'Too early.');
                             else % too early
                                 feedback_txt.Set('value', 'Too late.');

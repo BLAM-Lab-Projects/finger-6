@@ -1,4 +1,4 @@
-function WriteScanTgt(out_path,sess,block,image_type)
+function WriteScanTgt(out_path,sess,block,symbkey)
 % Make target files AVMA scanner task
 %
 %    WriteScanTgt(path, subjname, session, block, image_type);
@@ -20,20 +20,24 @@ function WriteScanTgt(out_path,sess,block,image_type)
 % 9. Go-Cue Delay (delay between stimulus presentation and Go-Cue
 
 TRlength = 1.1; % length of TR in seconds
-min_go_delay = 3; % minimum go-cue delay
-max_go_delay = 3; % maximum go-cue delay
+go_delay = 3; % minimum go-cue delay
+go_delay = 3; % maximum go-cue delay
 
 % load symbol key if it already exists for this subject
-if(~exist([path,'key.mat']))
+%{
+if(~exist([out_path,'key.mat']))
     symbkey = randperm(5); % symbol/key mapping press symbkey(i) for symbol i
-    eval(['save ', path,'key symbkey']);
+    eval(['save ', out_path,'key symbkey']);
 else
-    eval(['load ',path,'key']);
+    eval(['load ', out_path,'symbkey']);
 end
+%}
+%symbkey = [1:5 1:5];
 
-Nreps = 24;
-Nsymb = 5;
-Ntrials = Nreps*Nsymb;
+Nreps = 3;
+Nsymb = 10;
+Nrest = 3;
+Ntrials = Nreps*Nsymb+Nrest;
 
 subblock = zeros(Nreps,10);
 subblock(:,10) = 1; % active trials
@@ -56,12 +60,11 @@ tFile(:,1) = sess;
 tFile(:,2) = block;
 tFile(:,3) = 1:Ntrials; % trial number
 tFile(:,4) = 4+(0:Ntrials-1)*8; % TR number
-tFile(:,5) = image_type;
-tFile(:,8) = TRlength*rand(Ntrials,1); % randomly jitter stimulus presentation time relative to TR start time
+tFile(:,5) = 1;
+tFile(:,8) = 0;%TRlength*rand(Ntrials,1); % randomly jitter stimulus presentation time relative to TR start time
 tFile(:,9) = go_delay; % exponential distribution ~ mean(1s)
 
-filename = ['scan_','sess',num2str(sess), '_bk', num2str(block),...
-                '_sh', num2str(image_type), '.tgt'];
+filename = ['scan_','sess',num2str(sess), '_bk', num2str(block), '.tgt'];
     headers = {'sess','block','trial', 'trnum', 'image_type', 'image_index', 'finger_index',  ...
                'stim_delay', 'go_delay', 'trial_type'};
 

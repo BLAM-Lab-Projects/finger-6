@@ -1,7 +1,7 @@
 % make all target files for AVMA imaging experiment
-subjname = 'BAA';
+subjname = 'Alex';
 
-tgt_path = ['./',subjname,'/'];
+tgt_path = ['C:/Users/fmri/Desktop/finger-6/misc/tfiles/',subjname,'/'];
 
 if(~exist(tgt_path))
     mkdir(tgt_path);
@@ -10,7 +10,7 @@ end
 % generate key assignments for this subject
 if(~exist([tgt_path,'symbkey']));
     symbkey = [randperm(5), 5+randperm(5)];
-    save symbkey symbkey;
+    eval (['save ',[tgt_path 'symbkey'],' symbkey']);
 else
     load symbkey;
 end
@@ -25,15 +25,19 @@ numTRblocks = 6;
 
 % initial training on both symbol sets
 symbSet = 1;
-for blk = 1:numTrainingBlocks
-    WriteRtTgt(tgt_path, 'day', 1, 'block', blk, 'swapped', 0,...
-        'image_type', symbSet, 'repeats', 20, 'ind_finger', [1:5 1:5], 'ind_img',symbkey);
-end
-
+%for blk = 1:numTrainingBlocks
+    WriteRtTgt(tgt_path, 'day', 1, 'block', 1, 'swapped', 0,...
+        'image_type', symbSet, 'repeats', 20, 'ind_finger', [1:5], 'ind_img',symbkey(1:5));
+%end
+WriteRtTgt(tgt_path, 'day', 1, 'block', 2, 'swapped', 0,...
+        'image_type', symbSet, 'repeats', 20, 'ind_finger', [1:5], 'ind_img',symbkey(6:10));
+    
+    WriteRtTgt(tgt_path, 'day', 1, 'block', 3, 'swapped', 0,...
+        'image_type', symbSet, 'repeats', 10, 'ind_finger', [1:5 1:5], 'ind_img',symbkey);
 
 %% Day 1 - scan session
 for run = 1:10
-    WriteScanTgt(tgt_path,1,run,0);
+    WriteScanTgt(tgt_path,1,run,symbkey);
 end
 
 %% Day 1 - post-scan TR
@@ -64,7 +68,7 @@ end
 
 %% Day 5 scan - or just keep same as previous?
 for run = 1:10
-    WriteScanTgt(tgt_path,1,run,0);
+    WriteScanTgt(tgt_path,2,run,symbkey);
 end
 
 %% Day 5 post-scan

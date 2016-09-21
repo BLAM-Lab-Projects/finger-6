@@ -111,8 +111,7 @@ function WriteTrTgt(out_path, varargin)
                     repmat(image_type, combo_size, 1) combos];
 
                 
-    filename = ['tr_','dy',num2str(day), '_bk', num2str(block),...
-                '_sw', num2str(swapped2), '_sh', num2str(image_type), '.tgt'];
+    filename = ['tr_','dy',num2str(day), '_bk', num2str(block), '.tgt'];
     headers = {'day', 'block', 'trial', 'easy', ...
                'swapped', 'image_type','image_time', 'intended_finger',  ...
                'image_index', 'swap_index_1', 'swap_index_2'};

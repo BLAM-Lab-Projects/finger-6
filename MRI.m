@@ -52,6 +52,13 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
             end
             
             [~, presses, ~, releases] = kbrd.Check; % use for experimenter feedback
+            
+            if ~isnan(presses)
+               feedback2.Set(1, 'frame_color', [150 150 150]); % gray
+            else
+               feedback2.Set(1, 'frame_color', [255 255 255]);
+            end
+            
             if simulate
                 if GetSecs - baseline > 1
                     tr_count = tr_count + 1;
@@ -106,9 +113,11 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
                     
                    
             end % end state machine
-            
+            feedback2.Prime();
+            feedback2.Draw(1);
             feedback.Prime();
             feedback.Draw(1);
+
             
             pause(1e-7);
             window_time = win.Flip(window_time + 0.8 * win.flip_interval);

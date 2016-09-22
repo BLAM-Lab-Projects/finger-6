@@ -109,6 +109,8 @@ function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
                             %imgs.Draw(tgt.image_index(trial_count));
                             draw_imgs = true;
                             draw_go = false;
+                        else
+                            draw_go = true;
                         end
                         dat.trial(trial_count).stim_time = window_time + win.flip_interval;
                         save_time_go = true;
@@ -140,7 +142,7 @@ function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
                             end
                         end
                     else % rest trial
-                        
+                        draw_go = true;
                     end
 
                     if GetSecs >= end_time
@@ -175,6 +177,8 @@ function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
                          %   imgs.Prime();
                             %draw_imgs = true;
                            % imgs.Draw(tgt.image_index(trial_count));
+                        else % rest trial
+                            draw_go = true;
                         end
                         state = 'feedback';
                         draw_go = true;

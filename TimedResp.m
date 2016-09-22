@@ -207,11 +207,13 @@ function dat = TimedResp(id, file_name, fullscreen)
         aud.Close;
         imgs.Close;
         win.Close;
+        Priority(0);
 
 
     catch ERR
         % try to clean up resources
         ShowCursor;
+        Priority(0);
         sca;
         try
             kbrd.Close;

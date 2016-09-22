@@ -179,6 +179,8 @@ function dat = FreeResp(id, file_name, fullscreen)
         aud.Close;
         imgs.Close;
         win.Close;
+        Priority(0);
+
 
 
     catch ERR
@@ -191,6 +193,7 @@ function dat = FreeResp(id, file_name, fullscreen)
             disp('No audio device open.');
         end
         KbQueueRelease;
+        Priority(0);
         rethrow(ERR);
     end
 end

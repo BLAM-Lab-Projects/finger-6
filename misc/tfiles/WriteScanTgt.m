@@ -58,7 +58,7 @@ tFile(:,8) = 0;%TRlength*rand(Ntrials,1); % randomly jitter stimulus presentatio
 tFile(:,9) = go_delay; % exponential distribution ~ mean(1s)
 
 filename = ['scan_','sess',num2str(sess), '_bk', num2str(block), '.tgt'];
-    headers = {'sess','block','trial', 'trnum', 'image_type', 'image_index', 'finger_index',  ...
+    headers = {'sess','block','trial', 'trnum', 'image_type', 'finger_index', 'image_index',  ...
                'stim_delay', 'go_delay', 'trial_type'};
 
 	fid = fopen([out_path, filename], 'wt');

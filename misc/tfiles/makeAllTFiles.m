@@ -1,5 +1,5 @@
 % make all target files for AVMA imaging experiment
-subjname = 'Alex';
+subjname = 'BAA';
 
 tgt_path = ['C:/Users/fmri/Desktop/finger-6/misc/tfiles/',subjname,'/'];
 

@@ -80,15 +80,18 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
             switch state
                 case 'pretrial'
                     % check if it's time to start the trial
-                    if tr_count == tgt.trnum(trial_count)
+                    if tr_count >= tgt.trnum(trial_count)
                         state = 'prep';
+                        trial_start = GetSecs;
+                        dat.trial(trial_count).trial_start = trial_start;
+                        dat.trial(trial_count).trnum = tr_count;
                     end
                 case 'prep'
                     % draw the image
-                    if GetSecs >= tgt.stim_delay(trial_count)
+                    if GetSecs >= tgt.stim_delay(trial_count) + trial_start
                         [~, ~, dat.trial(trial_count).between_data] = kbrd.CheckMid();                       
                         imgs.Draw(tgt.image_index(trial_count));
-                        dat.trial(trial_count).time_image_real = window_time + win.flip_interval;
+                        dat.trial(trial_count).stim_time = window_time + win.flip_interval;
                         save_time_go = true;
                         state = 'gonogo';
                         go_time = GetSecs + tgt.go_delay(trial_count); % when to draw go cue
@@ -106,23 +109,25 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
                         end
                         if save_time_go
                             save_time_go = false;
-                            dat.trial(trial_count).time_go = window_time + win.flip_interval;
+                            dat.trial(trial_count).go_time = window_time + win.flip_interval;
                         end
                     end
                     
                     if GetSecs >= end_time
                         feedback.Set(1, 'frame_color', [255 255 255]);
                         state = 'feedback';
-                        [first_press, time_press, post_data] = kbrd.CheckMid();
+                        [first_press, time_press, dat.trial(trial_count).within_data] = kbrd.CheckMid();
                         if first_press == tgt.finger_index(trial_count)
-                            tmp_color = [97 255 77 255];
+                            tmp_color = [97 255 77 255]; % green
                         else
-                            tmp_color = [255, 30, 63 255];
+                            tmp_color = [255 30 63 255]; % red
                         end
                         imgs.Set(tgt.image_index(trial_count),...
                                  'modulate_color', tmp_color);
                         imgs.Prime();
                         imgs.Draw(tgt.image_index(trial_count));
+                        dat.trial(trial_count).press_index = first_press;
+                        dat.trial(trial_count).press_time = time_press;
                         end_feedback = GetSecs + .5;
                     end
                 case 'feedback'

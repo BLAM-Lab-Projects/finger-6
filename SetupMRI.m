@@ -93,5 +93,36 @@ end
 
 %% Data storage
 
-tr_struct = struct('times', zeros(1, max(tgt.trnum)), 'count', zeros(1, max(tgt.trnum)));
+tr_struct = struct('times', zeros(1, max(tgt.trnum)),...
+                   'count', zeros(1, max(tgt.trnum)));
 
+trial(1:length(tgt.trial)) = struct('trial_start', [], ... x
+    'between_data', [], ...x
+    'within_data', [], ...x
+    'image_index', [], ...x
+    'finger_index', [], ...x
+    'stim_delay', [], ...x
+    'stim_time', [], ...x
+    'go_delay', [], ...x
+    'go_time', [], ...x
+    'trnum', [], ...x
+    'trial_type', [], ...x
+    'press_index', [], ...x
+    'press_time', []); % which finger was pressedx
+
+for ii = 1:length(tgt.trial)
+    trial(ii).image_index = tgt.image_index(ii);
+    trial(ii).finger_index = tgt.finger_index(ii);
+    trial(ii).trnum = tgt.trnum(ii);
+    trial(ii).stim_delay = tgt.stim_delay(ii);
+    trial(ii).go_delay = tgt.go_delay(ii);
+    trial(ii).trial_type = tgt.trial_type(ii);
+end
+
+dat = struct('trial', trial, ...
+    'id', id, ...
+    'session', tgt.sess(1), ...
+    'shapes', tgt.image_type(1), ...
+    'block_start', [], ...x
+    'presses', [], ...x
+    'tr', tr_struct);

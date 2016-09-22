@@ -1,4 +1,4 @@
-function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
+function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
 
 %     try
         %% Setup
@@ -45,15 +45,18 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
         window_time = win.Flip();
         block_start = window_time;
         dat.block_start = block_start;
-        kbrd.Start;
+        if ~simulate_resp
+            kbrd.Start;
+        end
         
         Priority(win.priority);
         while ~done
             if trial_count > length(tgt.trial)
                 break;
             end
-            
+            if ~simulate_resp
             [~, presses, ~, releases] = kbrd.Check; % use for experimenter feedback
+            end
 %             if ~isnan(presses)
 %                feedback2.Set(1, 'frame_color', [150 150 150]); % gray
 %             else
@@ -89,8 +92,12 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
                 case 'prep'
                     % draw the image
                     if GetSecs >= tgt.stim_delay(trial_count) + trial_start
-                        [~, ~, dat.trial(trial_count).between_data] = kbrd.CheckMid();                       
-                        imgs.Draw(tgt.image_index(trial_count));
+                        if ~simulate_resp
+                            [~, ~, dat.trial(trial_count).between_data] = kbrd.CheckMid();                       
+                        end
+                        if tgt.image_index(trial_count) ~= 0
+                            imgs.Draw(tgt.image_index(trial_count));
+                        end
                         dat.trial(trial_count).stim_time = window_time + win.flip_interval;
                         save_time_go = true;
                         state = 'gonogo';
@@ -99,33 +106,45 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
                     end
                     
                 case 'gonogo'
-                    imgs.Draw(tgt.image_index(trial_count));
-                    % go?
-                    if GetSecs >= go_time
-                        if tgt.trial_type(trial_count)
-                            feedback.Set(1, 'frame_color', [97, 255, 77]);
-                        else
-                            feedback.Set(1, 'frame_alpha', 0);
-                        end
-                        if save_time_go
-                            save_time_go = false;
-                            dat.trial(trial_count).go_time = window_time + win.flip_interval;
-                        end
-                    end
-                    
-                    if GetSecs >= end_time
-                        feedback.Set(1, 'frame_color', [255 255 255]);
-                        state = 'feedback';
-                        [first_press, time_press, dat.trial(trial_count).within_data] = kbrd.CheckMid();
-                        if first_press == tgt.finger_index(trial_count)
-                            tmp_color = [97 255 77 255]; % green
-                        else
-                            tmp_color = [255 30 63 255]; % red
-                        end
-                        imgs.Set(tgt.image_index(trial_count),...
-                                 'modulate_color', tmp_color);
-                        imgs.Prime();
+                    if tgt.image_index(trial_count) ~= 0
                         imgs.Draw(tgt.image_index(trial_count));
+                        % go?
+                        if GetSecs >= go_time
+                            if tgt.trial_type(trial_count)
+                                feedback.Set(1, 'frame_color', [97, 255, 77]);
+                            else
+                                feedback.Set(1, 'frame_alpha', 0);
+                            end
+                            if save_time_go
+                                save_time_go = false;
+                                dat.trial(trial_count).go_time = window_time + win.flip_interval;
+                            end
+                        end
+                    else % rest trial
+                        
+                    end
+
+                    if GetSecs >= end_time
+                        if ~simulate_resp
+                            [first_press, time_press, dat.trial(trial_count).within_data] = kbrd.CheckMid();
+                        else
+                            first_press = 1;
+                            time_press = GetSecs;
+                        end
+                        if tgt.image_index(trial_count) ~= 0
+                            feedback.Set(1, 'frame_color', [255 255 255]);
+                            if first_press == tgt.finger_index(trial_count)
+                                tmp_color = [97 255 77 255]; % green
+                            else
+                                tmp_color = [255 30 63 255]; % red
+                            end
+                            imgs.Set(tgt.image_index(trial_count),...
+                                     'modulate_color', tmp_color);
+                            imgs.Prime();
+                            imgs.Draw(tgt.image_index(trial_count));
+                        end
+                        state = 'feedback';
+
                         dat.trial(trial_count).press_index = first_press;
                         dat.trial(trial_count).press_time = time_press;
                         end_feedback = GetSecs + .5;
@@ -134,9 +153,11 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
                     % change image color based on correctness
                     if GetSecs >= end_feedback
                         feedback.Set(1, 'frame_alpha', 255);
-                        imgs.Set(tgt.image_index(trial_count), ...
-                            'modulate_color', [255 255 255 255]);
-                        imgs.Prime();
+                        if tgt.image_index(trial_count) ~= 0
+                            imgs.Set(tgt.image_index(trial_count), ...
+                                'modulate_color', [255 255 255 255]);
+                            imgs.Prime();
+                        end
                         trial_count = trial_count + 1;
                         state = 'pretrial';
                     end
@@ -152,10 +173,13 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
         end % end infinite loop
             
         WaitSecs(0.5);
-        dat.presses = kbrd.long_term;
         sca;
-        kbrd.Stop;
-        kbrd.Close;
+        dat.tr = tr_struct;
+        if ~simulate_resp
+            dat.presses = kbrd.long_term;         
+            kbrd.Stop;
+            kbrd.Close;
+        end
         imgs.Close;
         win.Close;
         

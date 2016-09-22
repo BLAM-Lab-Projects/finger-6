@@ -53,7 +53,9 @@ info_txt = PobText('value', helptext, 'size', 40, ...
 %% Set up responses & feedback
 
 % use entire right hand
+if ~simulate_resp
 kbrd = BlamForceboard(1:5);
+end
 
 feedback = PobRectangle();
 
@@ -88,7 +90,7 @@ info_txt.Register(win.pointer);
 if ~simulate
     tr = BlamTr();
 else
-    
+    % do something else?
 end
 
 %% Data storage

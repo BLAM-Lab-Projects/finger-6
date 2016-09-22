@@ -32,6 +32,12 @@ for ii = 2:length(aud_names) + 1
     aud.Add('buffer', ii, 'audio', tmp.');
     aud.Map(ii, ii);
 end
+
+% punishment sounds
+snd1 = audioread('misc/sounds/barrierBeep.wav');
+aud.Add('slave', 10);
+aud.Add('buffer', 10, 'audio', [snd1, snd1]');
+aud.Map(10, 10);
 % audio warmup
 aud.Play(1, 0);
 aud.Stop(1);
@@ -104,7 +110,7 @@ trial(1:length(tgt.trial)) = struct('trial_start', [], ... % trial time relative
                       'between_data', [], ... % data dump for between trials
                       'within_data', [], ... % data dump for within the trial
                       'sub_swap', [],...
-                      'guesses', nan(1,4));
+                      'guesses', []);
 % fill in trial-specific information
 for ii = 1:length(tgt.trial)
     trial(ii).index_image = tgt.image_index(ii);

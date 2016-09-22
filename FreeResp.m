@@ -57,7 +57,7 @@ function dat = FreeResp(id, file_name, fullscreen)
 
                     [~, ~, dat.trial(trial_count).between_data] = kbrd.CheckMid();
                     trial_start = aud.Play(1, window_time + win.flip_interval);
-                    dat.trial(trial_count).trial_start = trial_start - block_start;
+                    dat.trial(trial_count).trial_start = trial_start;
                     imgs.Draw(tgt.image_index(trial_count));
                     state = 'intrial';
                 case 'intrial'
@@ -67,9 +67,12 @@ function dat = FreeResp(id, file_name, fullscreen)
                             if ~isnan(presses)
                                 dat.trial(trial_count).guesses(end + 1) = find(presses);
                                 if tgt.finger_index(trial_count) == find(presses)
-                                    feedback.Set(1, 'frame_color', [97, 255, 77]); % green
+                                    imgs.Set(tgt.image_index(trial_count),...
+                                        'modulate_color', [97 255 77 255]);
+                                    imgs.Prime();
+                                    imgs.Draw(tgt.image_index(trial_count));
+                                  %  feedback.Set(1, 'frame_color', [97, 255, 77]); % green
                                     tmp_press_index = find(presses);
-                                    wrong = false;
                                     state = 'feedback';
                                     feedback_time = GetSecs + 0.5;
                                     feed = true;
@@ -78,7 +81,13 @@ function dat = FreeResp(id, file_name, fullscreen)
                                    % if num_tries < 4
                                         substate = 'doghouse';
                                         num_tries = num_tries + 1;
-                                        feedback.Set(1, 'frame_color', [255, 30, 63]); %red
+                                        imgs.Set(tgt.image_index(trial_count),...
+                                        'modulate_color', [255, 30, 63 255]);
+                                        imgs.Prime();
+                                        imgs.Draw(tgt.image_index(trial_count));
+                                        %feedback.Set(1, 'frame_color', [255, 30, 63]); %red
+                                        % punishment sound
+                                        aud.Play(10, 0);
                                         tmp_press_index = find(presses);
                                         stop_penalty = GetSecs + 1;
 %                                     else
@@ -94,52 +103,56 @@ function dat = FreeResp(id, file_name, fullscreen)
                         case 'doghouse'
 
                             if GetSecs >= stop_penalty
+                                imgs.Set(tgt.image_index(trial_count),...
+                                        'modulate_color', [255 255 255 255]);
+                                imgs.Prime();
                                 substate = 'allgood';
                             else
-                                feedback.Set(1, 'frame_color', [255, 30, 63]); %red
+                                        imgs.Draw(tgt.image_index(trial_count));
+                                %feedback.Set(1, 'frame_color', [255, 30, 63]); %red
                             end
                     end
 
                 case 'feedback'
-                    imgs.Draw(tgt.image_index(trial_count));
+                    %imgs.Draw(tgt.image_index(trial_count));
                     if feed
-                        [first_press, time_press, post_data] = kbrd.CheckMid();
-                        dat.trial(trial_count).within_data = post_data;
-                        dat.trial(trial_count).time_press = time_press;
-                        dat.trial(trial_count).index_press = first_press;
-                        if wrong
+                        if num_tries == 1
+                            dat.trial(trial_count).correct = true;
+                            c_c_combo = c_c_combo + 1;
+                            if c_c_combo > 8
+                                c_c_combo = 8;
+                            end
+                            aud.Stop(1);
+                            aud.Play(c_c_combo + 1, 0);
+                        else
+                            aud.Stop(1);
+                            aud.Play(2, 0);
                             c_c_combo = 1;
                             dat.trial(trial_count).correct = false;
-                        else
-                            if num_tries == 1
-                                dat.trial(trial_count).correct = true;
-                                c_c_combo = c_c_combo + 1;
-                                if c_c_combo > 8
-                                    c_c_combo = 8;
-                                end
-                                aud.Stop(1);
-                                aud.Play(c_c_combo + 1, 0);
-                            else
-                                c_c_combo = 1;
-                                dat.trial(trial_count).correct = false;
-                            end
                         end
                         feed = false;
                         num_tries = 1;
                     end
-                    if wrong
-                        feedback.Set(1, 'frame_color', [85, 98, 255]); % blue
-                    else
-                        feedback.Set(1, 'frame_color', [97, 255, 77]); % green
-                    end
-
+                    %feedback.Set(1, 'frame_color', [97, 255, 77]); % green
                     if GetSecs >= feedback_time
+                        [first_press, time_press, post_data] = kbrd.CheckMid();
+                        dat.trial(trial_count).within_data = post_data;
+                        dat.trial(trial_count).time_press = time_press;
+                        dat.trial(trial_count).index_press = first_press;
                         extinguish_time = GetSecs + .1;
-                        feedback.Set(1, 'frame_color', [255 255 255]); % white
+                        imgs.Set(tgt.image_index(trial_count), 'modulate_color', [255 255 255 255]);
+                        imgs.Prime();
+                        imgs.Draw(tgt.image_index(trial_count));
+                        %feedback.Set(1, 'frame_color', [255 255 255]); % white
                         state = 'extinguish';
+                    else
+                        imgs.Set(tgt.image_index(trial_count), 'modulate_color', [97 255 77 255]);
+                        imgs.Prime();
+                        imgs.Draw(tgt.image_index(trial_count));
                     end
                 case 'extinguish'
-                    if GetSecs >= extinguish_time
+                    % wait until no presses
+                    if all(isnan(presses)) && GetSecs >= extinguish_time
                         state = 'pretrial';
                         substate = 'allgood';
                         frame_count = 1;

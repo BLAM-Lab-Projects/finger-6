@@ -53,11 +53,11 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
             
             [~, presses, ~, releases] = kbrd.Check; % use for experimenter feedback
             
-            if ~isnan(presses)
-               feedback2.Set(1, 'frame_color', [150 150 150]); % gray
-            else
-               feedback2.Set(1, 'frame_color', [255 255 255]);
-            end
+%             if ~isnan(presses)
+%                feedback2.Set(1, 'frame_color', [150 150 150]); % gray
+%             else
+%                feedback2.Set(1, 'frame_color', [255 255 255]);
+%             end
             
             if simulate
                 if GetSecs - baseline > 1
@@ -88,8 +88,8 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
                         dat.trial(trial_count).time_image_real = window_time + win.flip_interval;
                         save_time_go = true;
                         state = 'gonogo';
-                        go_time = GetSecs + 2;
-                        end_time = go_time + 2;
+                        go_time = GetSecs + 2; % when to draw go cue
+                        end_time = go_time + 2; % when to stop the go cue
                     end
                     
                 case 'gonogo'
@@ -111,10 +111,11 @@ function [dat, tr_struct]  = MRI(id, file_name, fullscreen, simulate)
                 case 'feedback'
                     % change image color based on correctness
                     
+                    
                    
             end % end state machine
-            feedback2.Prime();
-            feedback2.Draw(1);
+%             feedback2.Prime();
+%             feedback2.Draw(1);
             feedback.Prime();
             feedback.Draw(1);
 

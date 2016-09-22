@@ -77,10 +77,10 @@ feedback2.Add(1, 'rel_x_pos', 0.5, ...
 %% Register relative to window
 imgs.Register(win.pointer);
 feedback.Register(win.pointer);
-feedback2.Register(win.pointer);
+% feedback2.Register(win.pointer);
 imgs.Prime();
 feedback.Prime();
-feedback2.Prime();
+% feedback2.Prime();
 
 info_txt.Register(win.pointer);
 

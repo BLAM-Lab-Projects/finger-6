@@ -38,8 +38,8 @@ function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
             [key_times, key_vals] = tr.Check;
             if ~isnan(key_vals) && any(ismember(key_vals, {'t', '5'}))
                 tr_count = tr_count + 1;
-                tr_struct.count(tr_count - 1) = tr_count;
-                tr_struct.times(tr_count - 1) = key_times(ismember(key_vals, {'t', '5'}));
+                tr_struct.count(tr_count) = tr_count;
+                tr_struct.times(tr_count) = key_times(ismember(key_vals, {'t', '5'}));
             end
             WaitSecs(.1); % rate limit for no good reason
             end
@@ -83,6 +83,7 @@ function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
                 [key_times, key_vals] = tr.Check;
                 if ~isnan(key_times) && any(ismember(key_vals, {'t', '5'}))
                     tr_count = tr_count + 1;
+                    disp(['TR number: ', num2str(tr_count)]);
                     tr_struct.count(tr_count) = tr_count;
                     tr_struct.times(tr_count) = key_times(ismember(key_vals, {'t', '5'}));
                 end     
@@ -162,15 +163,17 @@ function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
                         if tgt.image_index(trial_count) ~= 0
                             go_cue.Set('color', [255 255 255]);
                             draw_go = true;
-                            if first_press == tgt.finger_index(trial_count) && tgt.trial_type(trial_count)
+                            if any(first_press == tgt.finger_index(trial_count)) && tgt.trial_type(trial_count)
                                 dat.trial(trial_count).correct = true;
                                 tmp_color = [97 255 77 255]; % green
-                            elseif isnan(first_press) && ~tgt.trial_type(trial_count)
+                            elseif any(isnan(first_press)) && ~tgt.trial_type(trial_count)
                                 dat.trial(trial_count).correct = nan;
                                 tmp_color = [97 255 77 255]; % green
-                            else
+                            elseif any(first_press ~= tgt.finger_index(trial_count)) && tgt.trial_type(trial_count)
                                 dat.trial(trial_count).correct = false;
                                 tmp_color = [255 30 63 255]; % red
+                            else
+                                dat.trial(trial_count).correct = nan;
                             end
                           %  imgs.Set(tgt.image_index(trial_count),...
                           %           'modulate_color', tmp_color);
@@ -235,6 +238,7 @@ function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
         imgs.Close;
         win.Close;
         Priority(0);
+        dat.tgt = tgt;
         disp(['Percent correct: ' num2str(mean([dat.trial.correct], 'omitnan'))]);
         disp(['Jumped the gun: ' num2str(mean(ismember([dat.trial.trial_type], ~isnan([dat.trial.press_index]))))]);
         

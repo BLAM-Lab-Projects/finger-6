@@ -1,5 +1,5 @@
 % make all target files for AVMA imaging experiment
-subjname = 'Adrian';
+subjname = 'Garbage';
 
 tgt_path = ['C:/Users/fmri/Desktop/finger-6/misc/tfiles/',subjname,'/'];
 
@@ -8,7 +8,7 @@ if(~exist(tgt_path))
 end
 
 % generate key assignments for this subject
-if(~exist([tgt_path,'symbkey']));
+if(~exist([tgt_path,'symbkey.mat']));
     symbkey = [randperm(5), 5+randperm(5)];
     eval (['save ',[tgt_path 'symbkey'],' symbkey']);
 else
@@ -34,7 +34,11 @@ WriteRtTgt(tgt_path, 'day', 1, 'block', 2, 'swapped', 0,...
     
     WriteRtTgt(tgt_path, 'day', 1, 'block', 3, 'swapped', 0,...
         'image_type', symbSet, 'repeats', 10, 'ind_finger', [1:5 1:5], 'ind_img',symbkey);
-
+ WriteRtTgt(tgt_path, 'day', 1, 'block', 4, 'swapped', 0,...
+        'image_type', symbSet, 'repeats', 10, 'ind_finger', [1:5 1:5], 'ind_img',symbkey);
+    % extra practice block
+     WriteRtTgt(tgt_path, 'day', 1, 'block', 5, 'swapped', 0,...
+        'image_type', symbSet, 'repeats', 10, 'ind_finger', [1:5 1:5], 'ind_img',symbkey);
 %% Day 1 - scan session
 for run = 1:10
     WriteScanTgt(tgt_path,1,run,symbkey);

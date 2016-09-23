@@ -1,8 +1,10 @@
 function dat = FreeResp(id, file_name, fullscreen)
+% dat = FreeResp(id, file_name, fullscreen)
+
 % strong assumptions made (5 choice only!)
 %
 % Example:
-%     data = FreeResp('misc/tgt/day1_block1.tgt', false, false);
+%     data = FreeResp();
 %                           tgt file    force transducers  fullscreen
     try
         %% Setup

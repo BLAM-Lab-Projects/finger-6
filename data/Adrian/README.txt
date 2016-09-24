@@ -3,7 +3,9 @@ Notes on behavioral data files:
 scan_practice.mat contains a practice block with a simulated trigger (i.e. no images were collected).
 scan2.mat actually used the tgtfile for day 2, session 1. However, this does not affect results, as
 there are no differences in the file structure or task between days.
-scan6.mat does not exist because the MATLAB program errored before 
+scan6.mat does not exist because the MATLAB program errored before the scan finished.
+
+Presses for digit 4 (index 4) are not present, due to an issue with one of the cables (now fixed).
 
 ----------------------------
 Notes on structure of data files:

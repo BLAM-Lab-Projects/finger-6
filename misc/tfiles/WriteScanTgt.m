@@ -37,7 +37,7 @@ fing_index = [1:5 1:5];
 % rearrange fing_index to point to appropriate finger
 
 
-combos = [zeros(10,1) fing_index' symbkey'; ones(10,1) fing_index' symbkey']
+combos = [zeros(10,1) fing_index' symbkey'; ones(10,1) fing_index' symbkey'];
 
 %combos(:,3) = (combos(:,2));
 combos = repmat(combos,Nreps,1);

@@ -112,7 +112,7 @@ trial(1:length(tgt.trial)) = struct('trial_start', [], ... % trial time relative
                       'index_image', [], ... % image index
                       'index_press', [], ...  % which finger pressed
                       'intended_finger', [], ...
-                      'correct', [], ... % index_press == index_finger
+                      'correct', [], ... % index_press == intended_finger
                       'frames', frames, ... % data for individual frames
                       'between_data', [], ... % data dump for between trials
                       'within_data', [], ... % data dump for within the trial

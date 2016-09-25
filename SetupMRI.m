@@ -107,7 +107,7 @@ trial(1:length(tgt.trial)) = struct('trial_start', [], ... x
     'between_data', [], ...x
     'within_data', [], ...x
     'image_index', [], ...x
-    'finger_index', [], ...x
+    'intended_finger', [], ...x
     'stim_delay', [], ...x
     'stim_time', [], ...x
     'go_delay', [], ...x
@@ -119,7 +119,7 @@ trial(1:length(tgt.trial)) = struct('trial_start', [], ... x
 
 for ii = 1:length(tgt.trial)
     trial(ii).image_index = tgt.image_index(ii);
-    trial(ii).finger_index = tgt.finger_index(ii);
+    trial(ii).intended_finger = tgt.intended_finger(ii);
     trial(ii).trnum = tgt.trnum(ii);
     trial(ii).stim_delay = tgt.stim_delay(ii);
     trial(ii).go_delay = tgt.go_delay(ii);

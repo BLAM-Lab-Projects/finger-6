@@ -163,13 +163,13 @@ function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
                         if tgt.image_index(trial_count) ~= 0
                             go_cue.Set('color', [255 255 255]);
                             draw_go = true;
-                            if any(first_press == tgt.finger_index(trial_count)) && tgt.trial_type(trial_count)
+                            if any(first_press == tgt.intended_finger(trial_count)) && tgt.trial_type(trial_count)
                                 dat.trial(trial_count).correct = true;
                                 tmp_color = [97 255 77 255]; % green
                             elseif any(isnan(first_press)) && ~tgt.trial_type(trial_count)
                                 dat.trial(trial_count).correct = nan;
                                 tmp_color = [97 255 77 255]; % green
-                            elseif any(first_press ~= tgt.finger_index(trial_count)) && tgt.trial_type(trial_count)
+                            elseif any(first_press ~= tgt.intended_finger(trial_count)) && tgt.trial_type(trial_count)
                                 dat.trial(trial_count).correct = false;
                                 tmp_color = [255 30 63 255]; % red
                             else

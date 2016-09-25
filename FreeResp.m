@@ -68,7 +68,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                         case 'allgood'
                             if ~isnan(presses)
                                 dat.trial(trial_count).guesses(end + 1) = find(presses);
-                                if tgt.finger_index(trial_count) == find(presses)
+                                if tgt.intended_finger(trial_count) == find(presses)
                                     imgs.Set(tgt.image_index(trial_count),...
                                         'modulate_color', [97 255 77 255]);
                                     imgs.Prime();

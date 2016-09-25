@@ -114,7 +114,7 @@ trial(1:length(tgt.trial)) = struct('trial_start', [], ... % trial time relative
 % fill in trial-specific information
 for ii = 1:length(tgt.trial)
     trial(ii).index_image = tgt.image_index(ii);
-    trial(ii).intended_finger = tgt.finger_index(ii);
+    trial(ii).intended_finger = tgt.intended_finger(ii);
     if (tgt.image_index(ii) == tgt.swap_index_1(ii)) || (tgt.image_index(ii) == tgt.swap_index_2(ii))
         trial(ii).sub_swap = true;
     else

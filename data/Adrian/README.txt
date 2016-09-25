@@ -18,7 +18,7 @@ dat
     - between_data: force transducer data that occurred between the previous and current trial (explanation below)
     - within_data: force transducer data during the current trial (explanation below)
     - image_index: index of the image (1 - 10)
-    - finger_index: requested finger (== to press_index for correctness)
+    - intended_finger: requested finger (== to press_index for correctness)
     - stim_delay: delay in seconds from the trial onset to the stimulus onset
     - stim_time: absolute time of stimulus/image presentation
     - go_delay: delay in seconds from the stimulus onset for the go/no-go cue
@@ -26,7 +26,7 @@ dat
     - trnum: TR count that starts the trial
     - trial_type: (1/0) 1 is go, 0 is no-go
     - press_index: actual index of the key pressed (1 - 5)
-    - correct: (1/0 == true/false) whether finger_index == press_index
+    - correct: (1/0 == true/false) whether intended_finger == press_index
   - id: Subject id (unused)
   - session: Session id (should be ~1 to 8)
   - shapes: (1/0) 1 is symbol cue, 0 is (unused) hand cue

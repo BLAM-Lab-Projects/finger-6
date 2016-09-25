@@ -34,13 +34,16 @@ Ntrials = Nreps*Nsymb+Nrest;
 % build target file with all reps
 
 fing_index = [1:5 1:5];
-combos = allcomb([0 1],symbkey);
+% rearrange fing_index to point to appropriate finger
 
-combos(:,3) = fing_index(combos(:,2));
+
+combos = [zeros(10,1) fing_index' symbkey'; ones(10,1) fing_index' symbkey']
+
+%combos(:,3) = (combos(:,2));
 combos = repmat(combos,Nreps,1);
 
 tFile = zeros(size(combos,1),10);
-tFile(:,6:7) = combos(:,[3 2]);
+tFile(:,6:7) = combos(:,[2 3]);
 tFile(:,10) = combos(:,1);
 tFile(:,4) = TRs_per_trial;
 

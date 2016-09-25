@@ -1,5 +1,6 @@
 % make all target files for AVMA imaging experiment
-subjname = 'Garbage';
+subjname = '001';
+rng(sum(uint8(subjname)));
 
 tgt_path = ['C:/Users/fmri/Desktop/finger-6/misc/tfiles/',subjname,'/'];
 

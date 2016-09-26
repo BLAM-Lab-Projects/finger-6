@@ -1,5 +1,5 @@
-function dat = FreeResp(id, file_name, fullscreen)
-% dat = FreeResp(id, file_name, fullscreen)
+function dat = FreeResp(file_name, fullscreen)
+% dat = FreeResp(file_name, fullscreen)
 
 % strong assumptions made (5 choice only!)
 %
@@ -182,8 +182,10 @@ function dat = FreeResp(id, file_name, fullscreen)
         imgs.Close;
         win.Close;
         Priority(0);
-
-
+        if ~exist(data_dir, 'dir')
+            mkdir(data_dir);
+        end
+        save(data_name, 'dat');
 
     catch ERR
         % try to clean up resources
@@ -196,6 +198,12 @@ function dat = FreeResp(id, file_name, fullscreen)
         end
         KbQueueRelease;
         Priority(0);
+        % save any existing data
+        if ~exist(data_dir, 'dir')
+            mkdir(data_dir);
+        end
+        save(data_name, 'dat');
+
         rethrow(ERR);
     end
 end

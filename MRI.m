@@ -1,7 +1,7 @@
-function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
-% dat = MRI(id, file_name, fullscreen, simulate_tr, simulate_resp)
+function dat  = MRI(file_name, fullscreen, simulate, simulate_resp)
+% dat = MRI(file_name, fullscreen, simulate_tr, simulate_resp)
 
-%     try
+     try
         %% Setup
         SetupMRI;
         
@@ -87,6 +87,10 @@ function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
                     tr_struct.count(tr_count) = tr_count;
                     tr_struct.times(tr_count) = key_times(ismember(key_vals, {'t', '5'}));
                 end     
+            end
+            
+            if ~isnan(key_times) && any(ismember(key_vals, {'ESCAPE'}))
+                error('Bailing out...');
             end
             
             switch state
@@ -238,18 +242,26 @@ function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
         imgs.Close;
         win.Close;
         Priority(0);
-        dat.tgt = tgt;
         disp(['Percent correct: ' num2str(mean([dat.trial.correct], 'omitnan'))]);
         disp(['Jumped the gun: ' num2str(mean(ismember([dat.trial.trial_type], ~isnan([dat.trial.press_index]))))]);
+        if ~exist(data_dir, 'dir')
+            mkdir(data_dir);
+        end
+        save(data_name, 'dat');
+    catch ERR
+        ShowCursor;
+        sca;
+        try
+            kbrd.Close();
+        catch
+            disp('No keyboard open.');
+        end
         
-%     catch ERR
-%         ShowCursor;
-%         sca;
-%         try
-%             kbrd.Close();
-%         catch
-%             disp('No keyboard open.');
-%         end
-%         rethrow(ERR);
-%     end
+        if ~exist(data_dir, 'dir')
+            mkdir(data_dir);
+        end
+        save(data_name, 'dat');
+        Priority(0);
+        rethrow(ERR);
+    end
 end

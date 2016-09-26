@@ -1,9 +1,9 @@
-function dat = TimedResp(id, file_name, fullscreen)
+function dat = TimedResp(file_name, fullscreen)
 % strong assumptions made (5 choice only!)
 %
 % Example:
-%     data = TimedResp('misc/tgt/day1_block1.tgt', false, false);
-%                           tgt file    force transducers  fullscreen
+%     data = TimedResp('misc/tgt/day1_block1.tgt', false);
+%                           tgt file              fullscreen
     try
         %% Setup
 
@@ -208,6 +208,10 @@ function dat = TimedResp(id, file_name, fullscreen)
         imgs.Close;
         win.Close;
         Priority(0);
+        if ~exist(data_dir, 'dir')
+            mkdir(data_dir);
+        end
+        save(data_name, 'dat');
 
 
     catch ERR
@@ -225,6 +229,11 @@ function dat = TimedResp(id, file_name, fullscreen)
         catch
             disp('No audio device open.');
         end
+        if ~exist(data_dir, 'dir')
+            mkdir(data_dir);
+        end
+        save(data_name, 'dat');
+        
         rethrow(ERR);
     end
 end

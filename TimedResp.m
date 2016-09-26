@@ -29,7 +29,7 @@ function dat = TimedResp(file_name, fullscreen)
         first_press = nan;
         tmp_image = 0;
         save_image_time = true;
-        goodjob = 0;
+        goodjob = true;
         draw_feedback_txt = false;
         aud_feedback = true;
 
@@ -85,9 +85,11 @@ function dat = TimedResp(file_name, fullscreen)
 
                     % Wrap up trial if almost done
                     if GetSecs >= trial_start + last_beep + 0.3
-                        [first_press, time_press, post_data] = kbrd.CheckMid();
+                        [first_press, time_press, post_data, max_press, t_max_press] = kbrd.CheckMid();
                         dat.trial(trial_count).index_press = first_press;
                         dat.trial(trial_count).time_press = time_press;
+                        dat.trial(trial_count).max_press = max_press;
+                        dat.trial(trial_count).time_max_press = t_max_press;
                         % force transducer times are relative to the start
                         % of the trial
                         post_data(:, 1) = post_data(:, 1);
@@ -109,10 +111,10 @@ function dat = TimedResp(file_name, fullscreen)
                         stop_feedback = start_feedback + 0.3;
 
                         % feedback for correct timing
-                        if abs(last_beep - (time_press - trial_start) + .2) > 0.1 || isnan(time_press)
+                        if abs(last_beep - (t_max_press - trial_start)) > 0.1 || isnan(time_press)
                             % bad
-                            disp(last_beep - (time_press - trial_start))
-                            if last_beep - (time_press - trial_start)  + .2> 0.1 || isnan(time_press)% too late
+                            disp(last_beep - (t_max_press - trial_start))
+                            if last_beep - (t_max_press - trial_start) > 0.1 || isnan(time_press)% too late
                                 feedback_txt.Set('value', 'Too early.');
                             else % too early
                                 feedback_txt.Set('value', 'Too late.');
@@ -125,14 +127,13 @@ function dat = TimedResp(file_name, fullscreen)
                 case 'feedback'
                     % feedback for correct index
                     aud.Stop(1);
-                    imgs.Draw(tgt.image_index(trial_count));
                     if draw_feedback_txt
                         feedback_txt.Draw();
                     end
 
-                    if ~isnan(tgt.image_index)
-                        if dat.trial(trial_count).correct || ...
-                                isnan(dat.trial(trial_count).correct) % nonexistant
+                    if ~isnan(tgt.image_index(trial_count))
+                        imgs.Draw(tgt.image_index(trial_count));
+                        if dat.trial(trial_count).correct
                                 feedback.Set(1, 'frame_color', [97, 255, 77]); % green
                         else
                             if ~isnan(first_press)

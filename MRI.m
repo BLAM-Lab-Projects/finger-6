@@ -132,7 +132,7 @@ function dat  = MRI(file_name, fullscreen, simulate, simulate_resp)
                         else
                             draw_go = true;
                         end
-                        %imgs.Draw(tgt.image_index(trial_count));
+                        
                         % go?
                         if GetSecs >= go_time
                             if tgt.trial_type(trial_count)
@@ -164,6 +164,8 @@ function dat  = MRI(file_name, fullscreen, simulate, simulate_resp)
                         disp(['Image index: ' num2str(tgt.image_index(trial_count))]);
                         disp(['Go/nogo: ' num2str(tgt.trial_type(trial_count))]);
                         disp(['Rest: ' num2str(tgt.image_index(trial_count) == 0)]);
+                        disp(['intended finger: ', num2str(tgt.intended_finger(trial_count))]);
+                        
                         if tgt.image_index(trial_count) ~= 0
                             go_cue.Set('color', [255 255 255]);
                             draw_go = true;
@@ -179,13 +181,11 @@ function dat  = MRI(file_name, fullscreen, simulate, simulate_resp)
                             else
                                 dat.trial(trial_count).correct = nan;
                             end
-                          %  imgs.Set(tgt.image_index(trial_count),...
-                          %           'modulate_color', tmp_color);
-                         %   imgs.Prime();
-                            %draw_imgs = true;
-                           % imgs.Draw(tgt.image_index(trial_count));
+
                         else % rest trial
                             draw_go = true;
+                            dat.trial(trial_count).correct = nan;
+                            
                         end
                         state = 'feedback';
                         draw_go = true;
@@ -196,10 +196,8 @@ function dat  = MRI(file_name, fullscreen, simulate, simulate_resp)
                 case 'feedback'
                     draw_go = true;
                     % change image color based on correctness
-                    if tgt.image_index(trial_count) ~= 0
-                        %imgs.Draw(tgt.image_index(trial_count));
-                        %draw_imgs = true;
-                    end
+                    feedback.Set(1, 'frame_color', tmp_color);
+
                     if GetSecs >= end_feedback
                         if tgt.image_index(trial_count) ~= 0
                             imgs.Set(tgt.image_index(trial_count), ...
@@ -210,8 +208,7 @@ function dat  = MRI(file_name, fullscreen, simulate, simulate_resp)
                         state = 'pretrial';
                     end
             end % end state machine
-%             feedback2.Prime();
-%             feedback2.Draw(1);
+
             feedback.Prime();
             feedback.Draw(1);
             

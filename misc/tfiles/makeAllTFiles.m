@@ -1,5 +1,5 @@
 % make all target files for AVMA imaging experiment
-subjname = '002';
+subjname = '001';
 rng(sum(uint8(subjname)));
 
 tgt_path = ['C:/Users/fmri/Desktop/finger-6/misc/tfiles/',subjname,'/'];
@@ -26,12 +26,15 @@ numTRblocks = 6;
 
 % initial training on both symbol sets
 symbSet = 1;
-training_perm = randperm(10);
+ind = rand(1,5)<.5; % random number from 1:10
+ind = [ind 1-ind];
+o = [1:5 1:5];
+training_perm = symbkey(o+5*ind);
 
 WriteRtTgt(tgt_path, 'day', 1, 'block', 1, 'swapped', 0,...
-    'image_type', symbSet, 'repeats', 20, 'ind_finger', [1:5], 'ind_img', symbkey(training_perm(1:5)));
+    'image_type', symbSet, 'repeats', 20, 'ind_finger', [1:5], 'ind_img', training_perm(1:5));
 WriteRtTgt(tgt_path, 'day', 1, 'block', 2, 'swapped', 0,...
-    'image_type', symbSet, 'repeats', 20, 'ind_finger', [1:5], 'ind_img', symbkey(training_perm(6:10)));
+    'image_type', symbSet, 'repeats', 20, 'ind_finger', [1:5], 'ind_img', training_perm(6:10));
     
 WriteRtTgt(tgt_path, 'day', 1, 'block', 3, 'swapped', 0,...
     'image_type', symbSet, 'repeats', 10, 'ind_finger', [1:5 1:5], 'ind_img', symbkey);
@@ -46,7 +49,7 @@ WriteRtTgt(tgt_path, 'day', 1, 'block', 5, 'swapped', 0,...
 for blk = 1:numTRblocks
 WriteTrTgt(tgt_path, ...
                 'day', 1, 'block', blk, 'swapped', 0,...
-                'image_type', 1, 'repeats', 20, 'easy_block', 0,...
+                'image_type', 1, 'repeats', 10, 'easy_block', 0,...
                 'ind_finger', [1:5 1:5], 'ind_img', symbkey, 'mintime', .2, 'maxtime', .8);
 end
 

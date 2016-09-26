@@ -1,4 +1,4 @@
-function WriteScanTgt(out_path,sess,block,symbkey)
+function WriteScanTgt(out_path, sess, block, symbkey)
 % Make target files AVMA scanner task
 %
 %    WriteScanTgt(path, subjname, session, block, image_type);

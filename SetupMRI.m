@@ -22,7 +22,7 @@ tgt_name = regexprep(tgt_name, '.tgt', '');
 % data directory
 data_dir = ['data/', id, '/'];
 % final file name (explicitly append .mat?)
-data_name = [data_dir, id, '_', tgt_name, '.mat'];
+data_name = [data_dir, id, '_', tgt_name, '_', datestr(now, 'hhMMSS'), '.mat'];
 
 %% Set up screen
 Screen('Preference', 'Verbosity', 1);

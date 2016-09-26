@@ -8,3 +8,4 @@ samples/
 *.m~HEAD
 misc/tfiles/*.tgt
 misc/tfiles/*/*.tgt
+data/testtfiles/

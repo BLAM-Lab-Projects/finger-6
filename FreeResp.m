@@ -137,10 +137,12 @@ function dat = FreeResp(file_name, fullscreen)
                     end
                     %feedback.Set(1, 'frame_color', [97, 255, 77]); % green
                     if GetSecs >= feedback_time
-                        [first_press, time_press, post_data] = kbrd.CheckMid();
+                        [first_press, time_press, post_data, max_press, time_max_press] = kbrd.CheckMid();
                         dat.trial(trial_count).within_data = post_data;
                         dat.trial(trial_count).time_press = time_press;
                         dat.trial(trial_count).index_press = first_press;
+                        dat.trial(trial_count).max_press = max_press;
+                        dat.trial(trial_count).time_max_press = time_max_press;
                         extinguish_time = GetSecs + .1;
                         imgs.Set(tgt.image_index(trial_count), 'modulate_color', [255 255 255 255]);
                         imgs.Prime();

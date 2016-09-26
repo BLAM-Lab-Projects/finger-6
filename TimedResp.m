@@ -90,6 +90,14 @@ function dat = TimedResp(file_name, fullscreen)
                         dat.trial(trial_count).time_press = time_press;
                         dat.trial(trial_count).max_press = max_press;
                         dat.trial(trial_count).time_max_press = t_max_press;
+                        disp('First press: ');
+                        disp(first_press);
+                        disp('Requested finger: ');
+                        disp(tgt.intended_finger(trial_count));
+                        disp('Image index: ');
+                        disp(tgt.image_index(trial_count));
+
+                        
                         % force transducer times are relative to the start
                         % of the trial
                         post_data(:, 1) = post_data(:, 1);

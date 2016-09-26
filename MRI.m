@@ -197,11 +197,14 @@ function dat  = MRI(file_name, fullscreen, simulate, simulate_resp)
                         dat.trial(trial_count).press_index = first_press;
                         dat.trial(trial_count).press_time = time_press;
                         end_feedback = GetSecs + .5;
+                        feedback_timer2 = end_feedback - .2;
                     end
                 case 'feedback'
                     draw_go = true;
                     % change image color based on correctness
-                    feedback.Set(1, 'frame_color', tmp_color);
+                    if GetSecs >= feedback_timer2
+                        feedback.Set(1, 'frame_color', tmp_color);
+                    end
 
                     if GetSecs >= end_feedback
                         if tgt.image_index(trial_count) ~= 0

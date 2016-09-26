@@ -1,5 +1,5 @@
 % make all target files for AVMA imaging experiment
-subjname = '001';
+subjname = '003';
 rng(sum(uint8(subjname)));
 
 tgt_path = ['C:/Users/fmri/Desktop/finger-6/misc/tfiles/',subjname,'/'];
@@ -41,12 +41,8 @@ WriteRtTgt(tgt_path, 'day', 1, 'block', 4, 'swapped', 0,...
     % extra practice block (for buffer)
 WriteRtTgt(tgt_path, 'day', 1, 'block', 5, 'swapped', 0,...
     'image_type', symbSet, 'repeats', 10, 'ind_finger', [1:5 1:5], 'ind_img', symbkey);
-%% Day 1 - scan session
-for run = 1:10
-    WriteScanTgt(tgt_path,1,run,symbkey);
-end
 
-%% Day 1 - post-scan TR
+%% Day 1 - timed response
 for blk = 1:numTRblocks
 WriteTrTgt(tgt_path, ...
                 'day', 1, 'block', blk, 'swapped', 0,...
@@ -54,8 +50,13 @@ WriteTrTgt(tgt_path, ...
                 'ind_finger', [1:5 1:5], 'ind_img', symbkey, 'mintime', .2, 'maxtime', .8);
 end
 
-%% Day 2-4 training
-for day = 2:4
+%% Day 2 - scan session
+for run = 1:10
+    WriteScanTgt(tgt_path,1,run,symbkey);
+end
+
+%% Day 3-4 training
+for day = 3:4
     for blk = 1:numPracticeBlocks
         WriteRtTgt(tgt_path, 'day', day, 'block', blk, 'swapped', 0,...
             'image_type', 1, 'repeats', 20, ...

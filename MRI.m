@@ -86,12 +86,14 @@ function dat  = MRI(file_name, fullscreen, simulate, simulate_resp)
                     disp(['TR number: ', num2str(tr_count)]);
                     tr_struct.count(tr_count) = tr_count;
                     tr_struct.times(tr_count) = key_times(ismember(key_vals, {'t', '5'}));
-                end     
+                end   
+                
+                if ~isnan(key_times) && any(ismember(key_vals, {'ESCAPE'}))
+                    error('Bailing out...');
+                end
             end
             
-            if ~isnan(key_times) && any(ismember(key_vals, {'ESCAPE'}))
-                error('Bailing out...');
-            end
+
             
             switch state
                 case 'pretrial'
@@ -154,36 +156,39 @@ function dat  = MRI(file_name, fullscreen, simulate, simulate_resp)
                         go_cue.Set('color', [255 255 255]);
                         draw_go = true;
                         if ~simulate_resp
-                            [first_press, time_press, dat.trial(trial_count).within_data] = kbrd.CheckMid();
+                            [first_press, time_press, dat.trial(trial_count).within_data, dat.trial(trial_count).max_press, dat.trial(trial_count).time_max_press] = kbrd.CheckMid();
                         else
                             first_press = 1;
                             time_press = GetSecs;
                         end
                         disp(['Trial: ' num2str(trial_count)]);
                         disp(['Press: ' num2str(first_press)]);
+                        disp(['intended finger: ', num2str(tgt.intended_finger(trial_count))]);
                         disp(['Image index: ' num2str(tgt.image_index(trial_count))]);
                         disp(['Go/nogo: ' num2str(tgt.trial_type(trial_count))]);
                         disp(['Rest: ' num2str(tgt.image_index(trial_count) == 0)]);
-                        disp(['intended finger: ', num2str(tgt.intended_finger(trial_count))]);
+                        disp(['Maximum force (actually voltage): ', num2str(dat.trial(trial_count).max_press)]);
                         
                         if tgt.image_index(trial_count) ~= 0
                             go_cue.Set('color', [255 255 255]);
                             draw_go = true;
                             if any(first_press == tgt.intended_finger(trial_count)) && tgt.trial_type(trial_count)
                                 dat.trial(trial_count).correct = true;
-                                tmp_color = [97 255 77 255]; % green
+                                tmp_color = [97 255 77]; % green
                             elseif any(isnan(first_press)) && ~tgt.trial_type(trial_count)
                                 dat.trial(trial_count).correct = nan;
-                                tmp_color = [97 255 77 255]; % green
+                                tmp_color = [255 255 255]; % green
                             elseif any(first_press ~= tgt.intended_finger(trial_count)) && tgt.trial_type(trial_count)
                                 dat.trial(trial_count).correct = false;
-                                tmp_color = [255 30 63 255]; % red
+                                tmp_color = [255 30 63]; % red
                             else
+                                tmp_color = [255 255 255];
                                 dat.trial(trial_count).correct = nan;
                             end
 
                         else % rest trial
                             draw_go = true;
+                            tmp_color = [255 255 255];
                             dat.trial(trial_count).correct = nan;
                             
                         end

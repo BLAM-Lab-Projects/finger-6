@@ -1,4 +1,5 @@
 Screen('Preference', 'SkipSyncTests', 1);
+Screen('Preference','VisualDebugLevel', 0);
 addpath(genpath('Psychoobox'));
 addpath(genpath('ptbutils'));
 tgt = ParseTgt(file_name, ',');

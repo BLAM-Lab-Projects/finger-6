@@ -13,7 +13,10 @@ if(~exist([tgt_path,'symbkey.mat']));
     symbkey = [randperm(5), 5+randperm(5)];
     eval (['save ',[tgt_path 'symbkey'],' symbkey']);
 else
-    load symbkey;
+    % commented is 'correct' way, but uncommented is how they were actually
+    % generated
+    %load([tgt_path, 'symbkey']);
+    load misc/tfiles/symbkey;
 end
 
 numTrainingBlocks = 3;
@@ -54,6 +57,11 @@ WriteTrTgt(tgt_path, ...
 end
 
 %% Day 2 - scan session
+
+% practice block
+WriteRtTgt(tgt_path, 'day', 2, 'block', 99, 'swapped', 0, ...
+    'image_type', 1, 'repeats', 5, 'ind_finger', [1:5 1:5], 'ind_img', symbkey);
+
 for run = 1:10
     WriteScanTgt(tgt_path,1,run,symbkey);
 end

@@ -204,6 +204,7 @@ function dat  = MRI(file_name, fullscreen, simulate, simulate_resp)
                     % change image color based on correctness
                     if GetSecs >= feedback_timer2
                         feedback.Set(1, 'frame_color', tmp_color);
+                        dat.trial(trial_count).feedback_time = window_time + win.flip_interval;
                     end
 
                     if GetSecs >= end_feedback
@@ -262,10 +263,14 @@ function dat  = MRI(file_name, fullscreen, simulate, simulate_resp)
             disp('No keyboard open.');
         end
         
-        if ~exist(data_dir, 'dir')
-            mkdir(data_dir);
+        try
+            if ~exist(data_dir, 'dir')
+                mkdir(data_dir);
+            end
+            save(data_name, 'dat');
+        catch
+            disp('No data open yet.');
         end
-        save(data_name, 'dat');
         Priority(0);
         rethrow(ERR);
     end

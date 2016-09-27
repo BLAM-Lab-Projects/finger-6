@@ -72,7 +72,7 @@ info_txt = PobText('value', helptext, 'size', 40, ...
 
 % use entire right hand
 if ~simulate_resp
-kbrd = BlamForceboard(1:5);
+    kbrd = BlamForceboard(1:5);
 end
 
 feedback = PobRectangle();

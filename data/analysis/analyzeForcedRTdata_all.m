@@ -2,7 +2,7 @@
 clear all
 
 subjnames = {'2016_09_27_Haith_001','2016_09_27_Haith_002','2016_09_27_Haith_003'};
-
+%subjnames = {'001','002','003'};
 fnames{1} = {'001_tr_dy1_bk1_122510','001_tr_dy1_bk2_123328','001_tr_dy1_bk3_124213','001_tr_dy1_bk4_124935'};
 fnames{2} = {'002_tr_dy1_bk1_142251','002_tr_dy1_bk2_143025','002_tr_dy1_bk3_143652','002_tr_dy1_bk4_144405'};
 fnames{3} = {'003_tr_dy1_bk1_165141','003_tr_dy1_bk2_171116','003_tr_dy1_bk3_171826','003_tr_dy1_bk4_172608'};
@@ -70,13 +70,16 @@ plot(d.RT,d.error+.1*randn(size(d.error)),'.')
 figure(4); clf; hold on
 w = .05;
 times = 0:.01:1;
-for i=1:length(times);
-    igood = find(d.RT>times(i)-w/2 & d.RT<times(i)+w/2);
-    phit(i) = sum(d.success(igood))/length(igood);
-    Nwindow(i) = length(igood)
+for subj = 1:3
+    for i=1:length(times);
+        igood = find(d.RT(subj,:)>times(i)-w/2 & d.RT(subj,:)<times(i)+w/2);
+        phit(subj,i) = sum(d.success(subj,igood))/length(igood);
+        Nwindow(subj,i) = length(igood)
+    end
 end
 subplot(3,1,[1 2]); hold on
-plot(times,phit)
+plot(times,phit')
+
 plot(times([1 end]),.25*[1 1],'k:')
 xlabel('RT')
 ylabel('p(success)')

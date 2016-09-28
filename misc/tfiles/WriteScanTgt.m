@@ -1,4 +1,4 @@
-function WriteScanTgt(out_path,sess,block,symbkey)
+function WriteScanTgt(out_path, sess, block, symbkey)
 % Make target files AVMA scanner task
 %
 %    WriteScanTgt(path, subjname, session, block, image_type);
@@ -37,7 +37,7 @@ fing_index = [1:5 1:5];
 % rearrange fing_index to point to appropriate finger
 
 
-combos = [zeros(10,1) fing_index' symbkey'; ones(10,1) fing_index' symbkey']
+combos = [zeros(10,1) fing_index' symbkey'; ones(10,1) fing_index' symbkey'];
 
 %combos(:,3) = (combos(:,2));
 combos = repmat(combos,Nreps,1);
@@ -69,7 +69,7 @@ tFile(:,8) = 0;%TRlength*rand(Ntrials,1); % randomly jitter stimulus presentatio
 tFile(:,9) = go_delay; % exponential distribution ~ mean(1s)
 
 filename = ['scan_','sess',num2str(sess), '_bk', num2str(block), '.tgt'];
-    headers = {'sess','block','trial', 'trnum', 'image_type', 'finger_index', 'image_index',  ...
+    headers = {'sess','block','trial', 'trnum', 'image_type', 'intended_finger', 'image_index',  ...
                'stim_delay', 'go_delay', 'trial_type'};
 
 	fid = fopen([out_path, filename], 'wt');

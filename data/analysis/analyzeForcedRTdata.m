@@ -3,7 +3,7 @@ clear all
 load ../timedresp
 
 figure(2); clf; hold on
-plot([tr_dat.trial.time_preparation],[tr_dat.trial(find([tr_dat.trial.index_finger]>0)).index_press]-[tr_dat.trial(find([tr_dat.trial.index_finger]>0)).index_finger],'.')
+plot([tr_dat.trial.time_preparation],[tr_dat.trial(find([tr_dat.trial.intended_finger]>0)).index_press]-[tr_dat.trial(find([tr_dat.trial.intended_finger]>0)).intended_finger],'.')
 
 d.RT = [tr_dat.trial.time_preparation];
 d.success = [tr_dat.trial(find(~isnan([tr_dat.trial.correct]))).correct];

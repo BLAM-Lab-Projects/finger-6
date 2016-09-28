@@ -1,5 +1,5 @@
-function dat = FreeResp(id, file_name, fullscreen)
-% dat = FreeResp(id, file_name, fullscreen)
+function dat = FreeResp(file_name, fullscreen)
+% dat = FreeResp(file_name, fullscreen)
 
 % strong assumptions made (5 choice only!)
 %
@@ -68,7 +68,7 @@ function dat = FreeResp(id, file_name, fullscreen)
                         case 'allgood'
                             if ~isnan(presses)
                                 dat.trial(trial_count).guesses(end + 1) = find(presses);
-                                if tgt.finger_index(trial_count) == find(presses)
+                                if tgt.intended_finger(trial_count) == find(presses)
                                     imgs.Set(tgt.image_index(trial_count),...
                                         'modulate_color', [97 255 77 255]);
                                     imgs.Prime();
@@ -137,10 +137,12 @@ function dat = FreeResp(id, file_name, fullscreen)
                     end
                     %feedback.Set(1, 'frame_color', [97, 255, 77]); % green
                     if GetSecs >= feedback_time
-                        [first_press, time_press, post_data] = kbrd.CheckMid();
+                        [first_press, time_press, post_data, max_press, time_max_press] = kbrd.CheckMid();
                         dat.trial(trial_count).within_data = post_data;
                         dat.trial(trial_count).time_press = time_press;
                         dat.trial(trial_count).index_press = first_press;
+                        dat.trial(trial_count).max_press = max_press;
+                        dat.trial(trial_count).time_max_press = time_max_press;
                         extinguish_time = GetSecs + .1;
                         imgs.Set(tgt.image_index(trial_count), 'modulate_color', [255 255 255 255]);
                         imgs.Prime();
@@ -182,8 +184,10 @@ function dat = FreeResp(id, file_name, fullscreen)
         imgs.Close;
         win.Close;
         Priority(0);
-
-
+        if ~exist(data_dir, 'dir')
+            mkdir(data_dir);
+        end
+        save(data_name, 'dat');
 
     catch ERR
         % try to clean up resources
@@ -196,6 +200,12 @@ function dat = FreeResp(id, file_name, fullscreen)
         end
         KbQueueRelease;
         Priority(0);
+        % save any existing data
+        if ~exist(data_dir, 'dir')
+            mkdir(data_dir);
+        end
+        save(data_name, 'dat');
+
         rethrow(ERR);
     end
 end

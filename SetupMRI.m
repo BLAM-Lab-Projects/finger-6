@@ -2,11 +2,28 @@
 
 %% Add paths
 Screen('Preference', 'SkipSyncTests', 1); 
+Screen('Preference','VisualDebugLevel', 0);
 addpath(genpath('Psychoobox'));
 addpath(genpath('ptbutils'));
 tgt = ParseTgt(file_name, ',');
 HideCursor;
 tgt = struct2table(tgt); % R2013b ++!
+
+% break it up into segments
+split_str = regexp(file_name, '/', 'split');
+
+% return values of particular portions
+% use name as stand-in for id
+id = split_str{end - 1};
+tgt_name = split_str{end};
+
+% lop off extension
+tgt_name = regexprep(tgt_name, '.tgt', '');
+
+% data directory
+data_dir = ['data/', id, '/'];
+% final file name (explicitly append .mat?)
+data_name = [data_dir, id, '_', tgt_name, '_', datestr(now, 'hhMMSS'), '.mat'];
 
 %% Set up screen
 Screen('Preference', 'Verbosity', 1);
@@ -55,7 +72,7 @@ info_txt = PobText('value', helptext, 'size', 40, ...
 
 % use entire right hand
 if ~simulate_resp
-kbrd = BlamForceboard(1:5);
+    kbrd = BlamForceboard(1:5);
 end
 
 feedback = PobRectangle();
@@ -107,7 +124,7 @@ trial(1:length(tgt.trial)) = struct('trial_start', [], ... x
     'between_data', [], ...x
     'within_data', [], ...x
     'image_index', [], ...x
-    'finger_index', [], ...x
+    'intended_finger', [], ...x
     'stim_delay', [], ...x
     'stim_time', [], ...x
     'go_delay', [], ...x
@@ -119,7 +136,7 @@ trial(1:length(tgt.trial)) = struct('trial_start', [], ... x
 
 for ii = 1:length(tgt.trial)
     trial(ii).image_index = tgt.image_index(ii);
-    trial(ii).finger_index = tgt.finger_index(ii);
+    trial(ii).intended_finger = tgt.intended_finger(ii);
     trial(ii).trnum = tgt.trnum(ii);
     trial(ii).stim_delay = tgt.stim_delay(ii);
     trial(ii).go_delay = tgt.go_delay(ii);
@@ -132,4 +149,5 @@ dat = struct('trial', trial, ...
     'shapes', tgt.image_type(1), ...
     'block_start', [], ...x
     'presses', [], ...x
-    'tr', tr_struct);
+    'tr', tr_struct, ...
+    'tgt', tgt);

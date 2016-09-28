@@ -2,10 +2,27 @@
 
 %% Add paths
 Screen('Preference', 'SkipSyncTests', 1);
+Screen('Preference','VisualDebugLevel', 0);
 addpath(genpath('Psychoobox'));
 addpath(genpath('ptbutils'));
 tgt = ParseTgt(file_name, ',');
 tgt = struct2table(tgt); % R2013b ++!
+
+% break it up into segments
+split_str = regexp(file_name, '/', 'split');
+
+% return values of particular portions
+% use name as stand-in for id
+id = split_str{end - 1};
+tgt_name = split_str{end};
+
+% lop off extension
+tgt_name = regexprep(tgt_name, '.tgt', '');
+
+% data directory
+data_dir = ['data/', id, '/'];
+% final file name (explicitly append .mat?)
+data_name = [data_dir, id, '_', tgt_name, '_', datestr(now, 'hhMMSS'), '.mat'];
 
 %% Set up screen
 HideCursor;
@@ -16,7 +33,7 @@ else
     win_size = [50 50 500 500];
 end
 
-win = PobWindow('screen', 0, ...
+win = PobWindow('screen', max(Screen('screens')), ...
                 'color', [0 0 0], ...
                 'rect', win_size);
 
@@ -112,14 +129,12 @@ trial(1:length(tgt.trial)) = struct('trial_start', [], ... % trial time relative
                       'index_image', [], ... % image index
                       'index_press', [], ...  % which finger pressed
                       'intended_finger', [], ...
-                      'correct', [], ... % index_press == index_finger
+                      'correct', [], ... % index_press == intended_finger
                       'frames', frames, ... % data for individual frames
                       'between_data', [], ... % data dump for between trials
                       'within_data', [], ... % data dump for within the trial
                       'sub_swap', [], ... % whether this trial contained swapped indices (t/f)
-                      'catch_trial', [],...
-                      'peak_force', [], ...
-                      'time_peak', []); % boolean (t/f)
+                      'catch_trial', []); % boolean (t/f)
 % fill in trial-specific information
 for ii = 1:length(tgt.trial)
     trial(ii).index_image = tgt.image_index(ii);

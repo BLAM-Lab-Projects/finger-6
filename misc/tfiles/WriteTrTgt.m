@@ -39,9 +39,6 @@ function WriteTrTgt(out_path, varargin)
     %    error('Make sure to define indices in increasing order.')
     %end
 
-    seed = day * block;
-    rand('seed', seed);
-
     combos = allcomb(1, ind_img);
     combos(:, 3) = -1;
     for ii = 1:length(ind_img)

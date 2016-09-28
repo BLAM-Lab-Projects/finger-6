@@ -1,7 +1,7 @@
-function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
-% dat = MRI(id, file_name, fullscreen, simulate_tr, simulate_resp)
+function dat  = MRI(file_name, fullscreen, simulate, simulate_resp)
+% dat = MRI(file_name, fullscreen, simulate_tr, simulate_resp)
 
-%     try
+     try
         %% Setup
         SetupMRI;
         
@@ -86,8 +86,14 @@ function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
                     disp(['TR number: ', num2str(tr_count)]);
                     tr_struct.count(tr_count) = tr_count;
                     tr_struct.times(tr_count) = key_times(ismember(key_vals, {'t', '5'}));
-                end     
+                end   
+                
+                if ~isnan(key_times) && any(ismember(key_vals, {'ESCAPE'}))
+                    error('Bailing out...');
+                end
             end
+            
+
             
             switch state
                 case 'pretrial'
@@ -128,7 +134,7 @@ function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
                         else
                             draw_go = true;
                         end
-                        %imgs.Draw(tgt.image_index(trial_count));
+                        
                         % go?
                         if GetSecs >= go_time
                             if tgt.trial_type(trial_count)
@@ -150,52 +156,57 @@ function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
                         go_cue.Set('color', [255 255 255]);
                         draw_go = true;
                         if ~simulate_resp
-                            [first_press, time_press, dat.trial(trial_count).within_data] = kbrd.CheckMid();
+                            [first_press, time_press, dat.trial(trial_count).within_data, dat.trial(trial_count).max_press, dat.trial(trial_count).time_max_press] = kbrd.CheckMid();
                         else
                             first_press = 1;
                             time_press = GetSecs;
                         end
                         disp(['Trial: ' num2str(trial_count)]);
                         disp(['Press: ' num2str(first_press)]);
+                        disp(['intended finger: ', num2str(tgt.intended_finger(trial_count))]);
                         disp(['Image index: ' num2str(tgt.image_index(trial_count))]);
                         disp(['Go/nogo: ' num2str(tgt.trial_type(trial_count))]);
                         disp(['Rest: ' num2str(tgt.image_index(trial_count) == 0)]);
+                        disp(['Maximum force (actually voltage): ', num2str(dat.trial(trial_count).max_press)]);
+                        
                         if tgt.image_index(trial_count) ~= 0
                             go_cue.Set('color', [255 255 255]);
                             draw_go = true;
-                            if any(first_press == tgt.finger_index(trial_count)) && tgt.trial_type(trial_count)
+                            if any(first_press == tgt.intended_finger(trial_count)) && tgt.trial_type(trial_count)
                                 dat.trial(trial_count).correct = true;
-                                tmp_color = [97 255 77 255]; % green
+                                tmp_color = [97 255 77]; % green
                             elseif any(isnan(first_press)) && ~tgt.trial_type(trial_count)
                                 dat.trial(trial_count).correct = nan;
-                                tmp_color = [97 255 77 255]; % green
-                            elseif any(first_press ~= tgt.finger_index(trial_count)) && tgt.trial_type(trial_count)
+                                tmp_color = [255 255 255]; % green
+                            elseif any(first_press ~= tgt.intended_finger(trial_count)) && tgt.trial_type(trial_count)
                                 dat.trial(trial_count).correct = false;
-                                tmp_color = [255 30 63 255]; % red
+                                tmp_color = [255 30 63]; % red
                             else
+                                tmp_color = [255 255 255];
                                 dat.trial(trial_count).correct = nan;
                             end
-                          %  imgs.Set(tgt.image_index(trial_count),...
-                          %           'modulate_color', tmp_color);
-                         %   imgs.Prime();
-                            %draw_imgs = true;
-                           % imgs.Draw(tgt.image_index(trial_count));
+
                         else % rest trial
                             draw_go = true;
+                            tmp_color = [255 255 255];
+                            dat.trial(trial_count).correct = nan;
+                            
                         end
                         state = 'feedback';
                         draw_go = true;
                         dat.trial(trial_count).press_index = first_press;
                         dat.trial(trial_count).press_time = time_press;
                         end_feedback = GetSecs + .5;
+                        feedback_timer2 = end_feedback - .2;
                     end
                 case 'feedback'
                     draw_go = true;
                     % change image color based on correctness
-                    if tgt.image_index(trial_count) ~= 0
-                        %imgs.Draw(tgt.image_index(trial_count));
-                        %draw_imgs = true;
+                    if GetSecs >= feedback_timer2
+                        feedback.Set(1, 'frame_color', tmp_color);
+                        dat.trial(trial_count).feedback_time = window_time + win.flip_interval;
                     end
+
                     if GetSecs >= end_feedback
                         if tgt.image_index(trial_count) ~= 0
                             imgs.Set(tgt.image_index(trial_count), ...
@@ -206,8 +217,7 @@ function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
                         state = 'pretrial';
                     end
             end % end state machine
-%             feedback2.Prime();
-%             feedback2.Draw(1);
+
             feedback.Prime();
             feedback.Draw(1);
             
@@ -238,18 +248,30 @@ function dat  = MRI(id, file_name, fullscreen, simulate, simulate_resp)
         imgs.Close;
         win.Close;
         Priority(0);
-        dat.tgt = tgt;
         disp(['Percent correct: ' num2str(mean([dat.trial.correct], 'omitnan'))]);
         disp(['Jumped the gun: ' num2str(mean(ismember([dat.trial.trial_type], ~isnan([dat.trial.press_index]))))]);
+        if ~exist(data_dir, 'dir')
+            mkdir(data_dir);
+        end
+        save(data_name, 'dat');
+    catch ERR
+        ShowCursor;
+        sca;
+        try
+            kbrd.Close();
+        catch
+            disp('No keyboard open.');
+        end
         
-%     catch ERR
-%         ShowCursor;
-%         sca;
-%         try
-%             kbrd.Close();
-%         catch
-%             disp('No keyboard open.');
-%         end
-%         rethrow(ERR);
-%     end
+        try
+            if ~exist(data_dir, 'dir')
+                mkdir(data_dir);
+            end
+            save(data_name, 'dat');
+        catch
+            disp('No data open yet.');
+        end
+        Priority(0);
+        rethrow(ERR);
+    end
 end

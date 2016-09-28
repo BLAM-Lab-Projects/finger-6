@@ -1,8 +1,25 @@
 Screen('Preference', 'SkipSyncTests', 1);
+Screen('Preference','VisualDebugLevel', 0);
 addpath(genpath('Psychoobox'));
 addpath(genpath('ptbutils'));
 tgt = ParseTgt(file_name, ',');
 tgt = struct2table(tgt); % R2013b ++!
+
+% break it up into segments
+split_str = regexp(file_name, '/', 'split');
+
+% return values of particular portions
+% use name as stand-in for id
+id = split_str{end - 1};
+tgt_name = split_str{end};
+
+% lop off extension
+tgt_name = regexprep(tgt_name, '.tgt', '');
+
+% data directory
+data_dir = ['data/', id, '/'];
+% final file name (explicitly append .mat?)
+data_name = [data_dir, id, '_', tgt_name, '_', datestr(now, 'hhMMSS'), '.mat'];
 
 %% Set up screen
 HideCursor;
@@ -114,7 +131,7 @@ trial(1:length(tgt.trial)) = struct('trial_start', [], ... % trial time relative
 % fill in trial-specific information
 for ii = 1:length(tgt.trial)
     trial(ii).index_image = tgt.image_index(ii);
-    trial(ii).intended_finger = tgt.finger_index(ii);
+    trial(ii).intended_finger = tgt.intended_finger(ii);
     if (tgt.image_index(ii) == tgt.swap_index_1(ii)) || (tgt.image_index(ii) == tgt.swap_index_2(ii))
         trial(ii).sub_swap = true;
     else

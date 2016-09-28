@@ -18,6 +18,18 @@ else
     %load([tgt_path, 'symbkey']);
     load misc/tfiles/symbkey;
 end
+if strcmp(subjname, '001')
+    train_set = [1 7 3 9 5];
+    upkeep_set = [6 2 8 4 10];
+elseif strcmp(subjname, '002')
+    train_set = 1:5;
+    upkeep_set = 6:10;
+elseif strcmp(subjname, '003')
+    train_set = 6:10;
+    upkeep_set = 1:5;
+else
+    error('No matching subject id.')
+end
 
 numTrainingBlocks = 3;
 numPracticeBlocks = 10;
@@ -71,18 +83,22 @@ for day = 3:4
     for blk = 1:numPracticeBlocks
         WriteRtTgt(tgt_path, 'day', day, 'block', blk, 'swapped', 0,...
             'image_type', 1, 'repeats', 20, ...
-                'ind_finger', [1:5], 'ind_img', symbkey(1:5));
+                'ind_finger', [1:5], 'ind_img', symbkey(train_set));
     end
+    
+    WriteRtTgt(tgt_path, 'day', day, 'block', 11, 'swapped', 0, ...
+        'image_type', 1, 'repeats', 10, ...
+        'ind_finger', [1:5], 'ind_img', symbkey(upkeep_set));
 end
 
 %% Day 5 pre-scan
-for day = 2:4
-    for blk = 1:numTrainingBlocks
-            WriteRtTgt(tgt_path, 'day', 5, 'block', blk, 'swapped', 0,...
-            'image_type', 1, 'repeats', 20, ...
-                'ind_finger', [1:5 1:5], 'ind_img', symbkey);
-    end
-end
+% for day = 2:4
+%     for blk = 1:numTrainingBlocks
+%             WriteRtTgt(tgt_path, 'day', 5, 'block', blk, 'swapped', 0,...
+%             'image_type', 1, 'repeats', 20, ...
+%                 'ind_finger', [1:5 1:5], 'ind_img', symbkey);
+%     end
+% end
 
 %% Day 5 scan - or just keep same as previous?
 for run = 1:10

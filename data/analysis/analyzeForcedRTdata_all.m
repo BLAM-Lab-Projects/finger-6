@@ -12,10 +12,10 @@ fnames{3} = {'003_tr_dy1_bk1_165141','003_tr_dy1_bk2_171116','003_tr_dy1_bk3_171
 for subjnum = 1:3
     RT = [];
     success = [];
-    error = [];
+    fingerError = [];
     for block = 1:4
         F = fullfile('../',subjnames{subjnum},fnames{subjnum}{block});
-        eval(['load ',F])
+        load(F);
         % preprocess to deal with awkward trials
         
         if(length(dat.trial)==111)
@@ -51,20 +51,20 @@ for subjnum = 1:3
         %dat.trial(111) = [];
         %plot([dat.trial.time_preparation],[dat.trial(find(~isnan([dat.trial.intended_finger]))).first_press]-[dat.trial(find(~isnan([dat.trial.intended_finger]))).intended_finger],'.')
         
-        %d.error = [d.error [dat.trial(find(~isnan([dat.trial.intended_finger]))).first_press]-[dat.trial(find(~isnan([dat.trial.intended_finger]))).intended_finger]];
-        error = [error [dat.trial.first_press] - [dat.trial.intended_finger]];
+        %d.fingerError = [d.fingerError [dat.trial(find(~isnan([dat.trial.intended_finger]))).first_press]-[dat.trial(find(~isnan([dat.trial.intended_finger]))).intended_finger]];
+        fingerError = [fingerError [dat.trial.first_press] - [dat.trial.intended_finger]];
         RT = [RT [dat.trial.time_preparation]];
         success = [success [dat.trial.correct]];
         
     end
-    d.error(subjnum,:) = error;
+    d.fingerError(subjnum,:) = fingerError;
     d.RT(subjnum,:) = RT;
     d.success(subjnum,:) = success;
 end
 
 %%
 figure(2); clf; hold on
-plot(d.RT,d.error+.1*randn(size(d.error)),'.')
+plot(d.RT,d.fingerError+.1*randn(size(d.fingerError)),'.')
 
 %% sliding window
 figure(4); clf; hold on
@@ -74,7 +74,7 @@ for subj = 1:3
     for i=1:length(times);
         igood = find(d.RT(subj,:)>times(i)-w/2 & d.RT(subj,:)<times(i)+w/2);
         phit(subj,i) = sum(d.success(subj,igood))/length(igood);
-        Nwindow(subj,i) = length(igood)
+        Nwindow(subj,i) = length(igood);
     end
 end
 subplot(3,1,[1 2]); hold on

@@ -24,15 +24,15 @@ symbkey_switched = symbkey;
 if strcmp(subjname, '001')
     train_set = [1 7 3 9 5];
     upkeep_set = [6 2 8 4 10];
-    symbkey_switched([5 3]) = symbkey_switched([3 5]);
+    symbkey_switched([4 5 2 3]) = symbkey_switched([2 3 4 5]);
 elseif strcmp(subjname, '002')
     train_set = 1:5;
     upkeep_set = 6:10;
-    symbkey_switched([4 2]) = symbkey_switched([2 4]);
+    symbkey_switched([4 2 10 8]) = symbkey_switched([2 4 8 10]);
 elseif strcmp(subjname, '003')
     train_set = 6:10;
     upkeep_set = 1:5;
-    symbkey_switched([4 2]) = symbkey_switched([2 4]);
+    symbkey_switched([4 2 10 8]) = symbkey_switched([2 4 8 10]);
 else
     error('No matching subject id.')
 end

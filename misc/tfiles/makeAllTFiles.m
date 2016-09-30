@@ -18,15 +18,21 @@ else
     %load([tgt_path, 'symbkey']);
     load misc/tfiles/symbkey;
 end
+
+symbkey_switched = symbkey;
+
 if strcmp(subjname, '001')
     train_set = [1 7 3 9 5];
     upkeep_set = [6 2 8 4 10];
+    symbkey_switched([5 3]) = symbkey_switched([3 5]);
 elseif strcmp(subjname, '002')
     train_set = 1:5;
     upkeep_set = 6:10;
+    symbkey_switched([4 2]) = symbkey_switched([2 4]);
 elseif strcmp(subjname, '003')
     train_set = 6:10;
     upkeep_set = 1:5;
+    symbkey_switched([4 2]) = symbkey_switched([2 4]);
 else
     error('No matching subject id.')
 end
@@ -91,30 +97,26 @@ for day = 3:4
         'ind_finger', [1:5], 'ind_img', symbkey(upkeep_set));
 end
 
-%% Day 5 pre-scan
-% for day = 2:4
-%     for blk = 1:numTrainingBlocks
-%             WriteRtTgt(tgt_path, 'day', 5, 'block', blk, 'swapped', 0,...
-%             'image_type', 1, 'repeats', 20, ...
-%                 'ind_finger', [1:5 1:5], 'ind_img', symbkey);
-%     end
-% end
-
 %% Day 5 scan - or just keep same as previous?
+WriteRtTgt(tgt_path, 'day', 5, 'block', 99, 'swapped', 0, ...
+    'image_type', 1, 'repeats', 5, 'ind_finger', [1:5 1:5], 'ind_img', symbkey);
+
 for run = 1:10
     WriteScanTgt(tgt_path,2,run,symbkey);
 end
 
 %% Day 5 post-scan
-% permute symbol key
-symbkey_switched = symbkey;
-symbkey_switched([2 4 8 10]) = symbkey([4 2 10 8]);
 
-for blk = 1:numTrainingBlocks
-    WriteRtTgt(tgt_path, 'day', 5, 'block', blk, 'swapped', [1 4],...
+for blk = 1:2
+    WriteRtTgt(tgt_path, 'day', 5, 'block', blk, 'swapped', 1,...
         'image_type', 1, 'repeats', 20, ...
         'ind_finger', [1:5 1:5], 'ind_img', symbkey_switched);
 end
 
-%for blk = 1:numTRblocks
- %   WriteTrTgt
+for blk = 1:numTRblocks
+    WriteTrTgt(tgt_path, ...
+                'day', 5, 'block', blk, 'swapped', 1,...
+                'image_type', 1, 'repeats', 10, 'easy_block', 0,...
+                'ind_finger', [1:5 1:5], 'ind_img', symbkey_switched,...
+                'mintime', .3, 'maxtime', .9);
+end

@@ -167,7 +167,7 @@ function dat  = MRI(file_name, fullscreen, simulate, simulate_resp)
                         disp(['Image index: ' num2str(tgt.image_index(trial_count))]);
                         disp(['Go/nogo: ' num2str(tgt.trial_type(trial_count))]);
                         disp(['Rest: ' num2str(tgt.image_index(trial_count) == 0)]);
-                        disp(['Maximum force (actually voltage): ', num2str(dat.trial(trial_count).max_press)]);
+                        %disp(['Maximum force (actually voltage): ', num2str(dat.trial(trial_count).max_press)]);
                         
                         if tgt.image_index(trial_count) ~= 0
                             go_cue.Set('color', [255 255 255]);

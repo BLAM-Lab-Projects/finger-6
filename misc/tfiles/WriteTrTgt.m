@@ -65,9 +65,9 @@ function WriteTrTgt(out_path, varargin)
     combos = combos2;
     combo_size = size(combos, 1);
 
-    if easy_block
-        combos(:, 1) = min(times);
-    end
+%     if easy_block
+%         combos(:, 1) = min(times);
+%     end
     
     combos(:,[4 5]) = 0;
     swapped2 = 0;

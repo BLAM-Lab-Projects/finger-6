@@ -11,12 +11,13 @@ end
 % generate key assignments for this subject
 if(~exist([tgt_path,'symbkey.mat']));
     symbkey = [randperm(5), 5+randperm(5)];
+    save([tgt_path, 'symbkey.mat', 'symbkey');
     eval (['save ',[tgt_path 'symbkey'],' symbkey']);
 else
     % commented is 'correct' way, but uncommented is how they were actually
     % generated
-    %load([tgt_path, 'symbkey']);
-    load misc/tfiles/symbkey;
+    load([tgt_path, 'symbkey']);
+    %load misc/tfiles/symbkey;
 end
 
 symbkey_switched = symbkey;

@@ -78,7 +78,7 @@ end
 
 %% Set up text
 helptext = ['This experiment is\nTimed Response.\n', ...
-            'Here is more text'];
+            ];
 
 info_txt = PobText('value', helptext, 'size', 50, ...
                    'color', [255 255 255], ...
@@ -123,7 +123,6 @@ frames(1:350) = struct('push_data', [], ... % complete push data (timestamps, et
 trial(1:length(tgt.trial)) = struct('trial_start', [], ... % trial time relative to the start of the experiment
                       'time_image', [], ... % image onset relative to time_start
                       'time_image_real', [], ... % image onset, accounting for rounding
-                      'prop_image', [], ... % time of image proportional to last beep
                       'time_press', [], ... % time of press relative to time_start
                       'time_preparation', [], ... % time_press - time_image
                       'index_image', [], ... % image index

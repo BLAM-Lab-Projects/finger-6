@@ -41,7 +41,7 @@ function dat = FreeResp(file_name, fullscreen)
         % event loop/state machine
         while ~done
             % short-term (and unsophisticated) check for keyboard presses
-            [~, presses, ~, releases] = kbrd.Check;
+            [~, presses] = kbrd.Check;
 
             if ~isnan(presses)
                 feedback.Set(1, 'frame_color', [150 150 150]); % gray
@@ -79,26 +79,17 @@ function dat = FreeResp(file_name, fullscreen)
                                     feedback_time = GetSecs + 0.5;
                                     feed = true;
                                 else
-                                    % only allow a few guesses
-                                   % if num_tries < 4
-                                        substate = 'doghouse';
-                                        num_tries = num_tries + 1;
-                                        imgs.Set(tgt.image_index(trial_count),...
-                                        'modulate_color', [255, 30, 63 255]);
-                                        imgs.Prime();
-                                        imgs.Draw(tgt.image_index(trial_count));
-                                        %feedback.Set(1, 'frame_color', [255, 30, 63]); %red
-                                        % punishment sound
-                                        aud.Play(10, 0);
-                                        tmp_press_index = find(presses);
-                                        stop_penalty = GetSecs + 1;
-%                                     else
-%                                         wrong = true;
-%                                         state = 'feedback';
-%                                         feedback_time = GetSecs + 0.5;
-%                                         feed = true;
-
-                                  %  end
+                                    substate = 'doghouse';
+                                    num_tries = num_tries + 1;
+                                    imgs.Set(tgt.image_index(trial_count),...
+                                    'modulate_color', [255, 30, 63 255]);
+                                    imgs.Prime();
+                                    imgs.Draw(tgt.image_index(trial_count));
+                                    %feedback.Set(1, 'frame_color', [255, 30, 63]); %red
+                                    % punishment sound
+                                    aud.Play(10, 0);
+                                    tmp_press_index = find(presses);
+                                    stop_penalty = GetSecs + 1;
                                 end
 
                             end
@@ -110,13 +101,11 @@ function dat = FreeResp(file_name, fullscreen)
                                 imgs.Prime();
                                 substate = 'allgood';
                             else
-                                        imgs.Draw(tgt.image_index(trial_count));
-                                %feedback.Set(1, 'frame_color', [255, 30, 63]); %red
+                                imgs.Draw(tgt.image_index(trial_count));
                             end
                     end
 
                 case 'feedback'
-                    %imgs.Draw(tgt.image_index(trial_count));
                     if feed
                         if num_tries == 1
                             dat.trial(trial_count).correct = true;
@@ -135,7 +124,6 @@ function dat = FreeResp(file_name, fullscreen)
                         feed = false;
                         num_tries = 1;
                     end
-                    %feedback.Set(1, 'frame_color', [97, 255, 77]); % green
                     if GetSecs >= feedback_time
                         [first_press, time_press, post_data, max_press, time_max_press] = kbrd.CheckMid();
                         dat.trial(trial_count).within_data = post_data;
@@ -165,7 +153,7 @@ function dat = FreeResp(file_name, fullscreen)
             end % end state machine
             feedback.Prime();
             feedback.Draw(1);
-            window_time = win.Flip(window_time + 0.8 * win.flip_interval);
+            window_time = win.Flip(window_time + 0.5 * win.flip_interval);
             frame_count = frame_count + 1;
             pause(1e-5);
 

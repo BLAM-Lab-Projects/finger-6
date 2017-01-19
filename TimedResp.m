@@ -110,6 +110,8 @@ function dat = TimedResp(file_name, fullscreen)
                             dat.trial(trial_count).catch_trial = false;
                             dat.trial(trial_count).correct = first_press == tgt.intended_finger(trial_count);
                         else
+                            dat.trial(trial_count).time_image_real = nan;
+                            dat.trial(trial_count).time_preparation = nan;
                             dat.trial(trial_count).catch_trial = true;
                             dat.trial(trial_count).correct = nan;
                         end

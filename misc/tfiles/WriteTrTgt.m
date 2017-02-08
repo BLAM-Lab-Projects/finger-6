@@ -12,7 +12,8 @@ function WriteTrTgt(out_path, varargin)
     opts = struct('day', 1, 'block', 1, 'swapped', 0, ...
                   'image_type', 0, 'repeats', 3, ...
                   'easy_block', 0, 'ind_finger', 1:5, ...
-                  'ind_img', 1:5, 'mintime', 0.05, 'maxtime', 0.5);
+                  'ind_img', 1:5, 'mintime', 0.05, 'maxtime', 0.5, ...
+				  'catchtrials', true);
     opts = CheckInputs(opts, varargin{:});
 
     day = opts.day;
@@ -25,6 +26,7 @@ function WriteTrTgt(out_path, varargin)
     ind_img = opts.ind_img;
     mintime = opts.mintime;
     maxtime = opts.maxtime;
+	catchtrials = opts.catchtrials;
 
 
     if length(ind_finger) ~= length(ind_img)
@@ -35,10 +37,6 @@ function WriteTrTgt(out_path, varargin)
         error('Swapping goes by index, not the actual value.');
     end
 
-    %if any(diff(ind_img) < 0) || any(diff(ind_img) < 0)
-    %    error('Make sure to define indices in increasing order.')
-    %end
-
     combos = allcomb(1, ind_img);
     combos(:, 3) = -1;
     for ii = 1:length(ind_img)
@@ -47,7 +45,7 @@ function WriteTrTgt(out_path, varargin)
     end
     combos(:,[2 3]) = combos(:,[3 2]);
 	combos = repmat(combos, repeats, 1);
-    limit = 10000;
+    limit = 1e5;
     maxnum = 3;
     count = 1;
     while count < limit
@@ -64,40 +62,29 @@ function WriteTrTgt(out_path, varargin)
 
     combos = combos2;
     combo_size = size(combos, 1);
-
-%     if easy_block
-%         combos(:, 1) = min(times);
-%     end
     
     combos(:,[4 5]) = 0;
     swapped2 = 0;
-    %{
-    if any(swapped > 0) % if not zero
-        combos(:, 4) = swapped(1);
-        combos(:, 5) = swapped(2);
-        swapped2 = 1;
-        ind_img([swapped(2), swapped(1)]) = ind_img([swapped(1), swapped(2)]);
-    else
-        combos(:, 4:5) = 0;
-        swapped2 = 0;
-    end
-    %}
+
     % combos is (times, finger, image, swap1, swap2)
 
     % add random prep times
     combos(:,1) = mintime+rand(size(combos(:,1)))*(maxtime-mintime);
     
-    % add catch trials
-    num_catch = floor(combo_size/10);
-    randind = randi([-2 2], 1, num_catch);
-    catchind = (10:10:combo_size) + randind;
-    if catchind(end) > combo_size
-        catchind(end) = combo_size;
-    end
-    % time, finger, img_time, indices of two swapped images
+    % add catch trials?
+	if catchtrials
+		num_catch = floor(combo_size/10);
+		randind = randi([-2 2], 1, num_catch);
+		catchind = (10:10:combo_size) + randind;
+		if catchind(end) > combo_size
+			catchind(end) = combo_size;
+		end
+		% time, finger, img_time, indices of two swapped images
 
-    catch_trial = [nan nan nan combos(1, 4:5)];
-    combos = insertrows(combos, catch_trial, catchind);
+		catch_trial = [nan nan nan combos(1, 4:5)];
+		combos = insertrows(combos, catch_trial, catchind);
+	
+	end
     combo_size = size(combos, 1);
 
     final_output = [repmat(day, combo_size, 1) ...

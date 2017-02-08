@@ -1,0 +1,5 @@
+day,block,trial,swapped,image_type,intended_finger,image_index,swap_index_1,swap_index_2
+1,1,1,0,0,4,9,0,0
+1,1,2,0,0,3,8,0,0
+1,1,3,0,0,5,10,0,0
+1,1,4,0,0,2,7,0,0

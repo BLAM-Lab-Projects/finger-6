@@ -39,7 +39,8 @@ win = PobWindow('screen', max(Screen('screens')), ...
 
 %% Set up audio
 aud = PobAudio;
-snd0 = GenClick(1046, 0.45, 3);
+%% NOTE: adjusted to 1.5hz
+snd0 = GenClick(1046, 1/1.5, 4); % generate 1.75hz click train
 % 0.02 is the size of one beep (fixed!)
 last_beep = (length(snd0) - 0.02 * 44100)/44100;
 snd1 = audioread('misc/sounds/smw_coin.wav');
@@ -52,6 +53,7 @@ aud.Map(1, 1);
 aud.Map(2, 2);
 % audio warmup
 aud.Play(1, 0);
+WaitSecs(0.2);
 aud.Stop(1);
 %time_out = aud.Play(index, time);
 
@@ -155,3 +157,6 @@ dat = struct('trial', trial, ...
              'last_beep', last_beep, ...
              'presses', []); % time of the last beep, relative to the onset of audio
 clear trial frame
+
+KbName('UnifyKeyNames');
+RestrictKeysForKbCheck(KbName({'ESCAPE'}));

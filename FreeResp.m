@@ -25,7 +25,7 @@ function dat = FreeResp(file_name, fullscreen)
         end
         % need to prime resp_feedback after each change??
         done = false;
-        trial_count = 0;
+        trial_count = 1;
         frame_count = 1;
         state = 'pretrial';
         substate = 'allgood'; % allgood, doghouse (ignore responses)
@@ -43,15 +43,14 @@ function dat = FreeResp(file_name, fullscreen)
             % short-term (and unsophisticated) check for keyboard presses
             [~, presses] = kbrd.Check;
 
-            if ~isnan(presses)
-                feedback.Set(1, 'frame_color', [150 150 150]); % gray
-            else
-                feedback.Set(1, 'frame_color', [255 255 255]);
-            end
+            % bailout - hold escape
+			[kd] = KbCheck();
+			if kd
+			    break;
+			end
 
             switch state
                 case 'pretrial'
-                    trial_count = trial_count + 1;
                     if trial_count > length(tgt.trial)
                         % end of experiment
                         break;
@@ -145,9 +144,10 @@ function dat = FreeResp(file_name, fullscreen)
                 case 'extinguish'
                     % wait until no presses
                     if all(isnan(presses)) && GetSecs >= extinguish_time
+					    trial_count = trial_count + 1;
                         state = 'pretrial';
                         substate = 'allgood';
-                        frame_count = 1;
+                        frame_count = 0;
                     end
                     
             end % end state machine

@@ -146,3 +146,7 @@ dat = struct('trial', trial, ...
              'tgt', table2struct(tgt), ...
              'presses', []); % time of the last beep, relative to the onset of audio
 clear trial frame
+
+
+KbName('UnifyKeyNames');
+RestrictKeysForKbCheck(KbName({'ESCAPE'}));

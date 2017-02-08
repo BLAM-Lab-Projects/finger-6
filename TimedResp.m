@@ -13,9 +13,9 @@ function dat = TimedResp(file_name, fullscreen)
         win.Flip();
         WaitSecs(1);
 
-        for ii = 1:3
+        for ii = fliplr(1:5)
             helptext = ['Experiment starting in\n', ...
-                        num2str(4 - ii), ' seconds'];
+                        num2str(ii), ' seconds'];
             info_txt.Set('value', helptext);
             info_txt.Draw();
             win.Flip;
@@ -46,6 +46,12 @@ function dat = TimedResp(file_name, fullscreen)
                 % end of experiment
                 break;
             end
+			
+			% bailout - hold escape
+			[kd] = KbCheck();
+			if kd
+			    break;
+			end
 
             % short-term (and unsophisticated) check for keyboard presses
             [~, presses, ~, releases] = kbrd.Check;
@@ -61,11 +67,11 @@ function dat = TimedResp(file_name, fullscreen)
                 case 'pretrial'
                     % Dump non-relevant data elsewhere (but still
                     % accessible)
-                    trial_count = trial_count + 1;
                     startdev = true;
                     % schedule audio for next window flip onset
                     trial_start = aud.Play(1, window_time + win.flip_interval);
                     % absolute start of the trial
+                    trial_count = trial_count + 1;
                     dat.trial(trial_count).trial_start = trial_start;
                     state = 'intrial';
                 case 'intrial'
@@ -169,12 +175,12 @@ function dat = TimedResp(file_name, fullscreen)
                         if isnan(first_press)
                             if ~isnan(presses)% at least made one press
                                 state = 'posttrial';
-                                next_trial = GetSecs + 0.4;
+                                next_trial = GetSecs + 0.6;
                                 save_image_time = true;
                             end
                         else
                             state = 'posttrial';
-                            next_trial = GetSecs + 0.4;
+                            next_trial = GetSecs + 0.6;
                             save_image_time = true;
                         end
                     end
@@ -183,7 +189,7 @@ function dat = TimedResp(file_name, fullscreen)
                         state = 'pretrial';
                         first_press = nan;
                         feedback.Set(1, 'frame_color', [255 255 255]); % white
-                        frame_count = 1;
+                        frame_count = 0;
                         goodjob = true;
                         draw_feedback_txt = false;
                         aud_feedback = true;
@@ -198,13 +204,12 @@ function dat = TimedResp(file_name, fullscreen)
                 startdev = false;
             end
             pause(1e-5);
-
+            frame_count = frame_count + 1;
             dat.trial(trial_count).frames(frame_count).push_data = kbrd.short_term;
             dat.trial(trial_count).frames(frame_count).state = state;
             dat.trial(trial_count).frames(frame_count).image = tmp_image;
             tmp_image = 0;
             dat.trial(trial_count).frames(frame_count).time_frame = window_time;
-            frame_count = frame_count + 1;
             window_time = win.Flip(window_time + 0.8 * win.flip_interval);
 
         end % end event loop, cleanup

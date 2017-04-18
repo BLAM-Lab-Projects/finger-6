@@ -40,7 +40,7 @@ win = PobWindow('screen', max(Screen('screens')), ...
 %% Set up audio
 aud = PobAudio;
 %% NOTE: adjusted to 1.5hz
-snd0 = GenClick(1046, 1/1.5, 4); % generate 1.75hz click train
+snd0 = GenClick(1046, 1/1.8, 4); % generate 1.75hz click train
 % 0.02 is the size of one beep (fixed!)
 last_beep = (length(snd0) - 0.02 * 44100)/44100;
 snd1 = audioread('misc/sounds/smw_coin.wav');

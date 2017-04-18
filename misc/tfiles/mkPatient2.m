@@ -1,5 +1,5 @@
 %% NB: blocks 7 & 8 have adjusted max time
-subjname = 'cb04';
+subjname = 'cb05';
 rng(sum(uint8(subjname)));
 
 tgt_path = ['C:/Users/fmri/Desktop/finger-6/misc/tfiles/',subjname,'/'];
@@ -48,10 +48,10 @@ WriteTrTgt(tgt_path, 'day', 1, 'block', 6, 'swapped', 0, ...
     'ind_finger', 2:5, 'ind_img', 7:10, 'mintime', 0.3, 'maxtime', 0.9);
 WriteTrTgt(tgt_path, 'day', 1, 'block', 7, 'swapped', 0, ...
     'image_type', 0, 'repeats', 20, ...
-    'ind_finger', 2:5, 'ind_img', 7:10, 'mintime', 0.3, 'maxtime', 1.5);
+    'ind_finger', 2:5, 'ind_img', 7:10, 'mintime', 0.3, 'maxtime', 0.9);
 WriteTrTgt(tgt_path, 'day', 1, 'block', 8, 'swapped', 0, ...
     'image_type', 0, 'repeats', 20, ...
-    'ind_finger', 2:5, 'ind_img', 7:10, 'mintime', 0.3, 'maxtime', 1.5);
+    'ind_finger', 2:5, 'ind_img', 7:10, 'mintime', 0.3, 'maxtime', 0.9);
 	
 % symbols
 WriteRtTgt(tgt_path, 'day', 1, 'block', 9, 'swapped', 0,...
